@@ -34,11 +34,10 @@ dependencies {
     implementation "io.ktor:ktor-server-netty:$ktor_version"
     implementation "ch.qos.logback:logback-classic:$logback_version"
     implementation "io.ktor:ktor-server-core:$ktor_version"
-    implementation "io.ktor:ktor-html-builder:$ktor_version"
-    implementation "org.jetbrains:kotlin-css-jvm:1.0.0-pre.31-kotlin-1.2.41"
-    implementation "io.ktor:ktor-client-core:$ktor_version"
-    implementation "io.ktor:ktor-client-core-jvm:$ktor_version"
-    implementation "io.ktor:ktor-client-apache:$ktor_version"
+    implementation "io.ktor:ktor-jackson:$ktor_version"
+    implementation group: 'com.zaxxer', name: 'HikariCP', version: '3.2.0'
+    implementation 'org.jetbrains.exposed:exposed:0.17.7'
+    implementation 'com.beust:klaxon:5.0.5'
+    runtime group: 'org.postgresql', name: 'postgresql', version: '42.1.4'
     testImplementation "io.ktor:ktor-server-tests:$ktor_version"
-    compile "org.flywaydb:flyway-core:6.3.3"
 }
