@@ -3,6 +3,7 @@ package com.medtracker.controllers
 import com.medtracker.models.User
 import com.medtracker.models.UserDTO
 import com.medtracker.repositories.UserDAO
+import com.medtracker.services.UserService
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
@@ -14,26 +15,6 @@ import org.joda.time.format.DateTimeFormatter
 
 
 class UserController {
-
-    fun getAll(): ArrayList<User> {
-        val users: ArrayList<User> = arrayListOf()
-        transaction {
-            UserDAO.selectAll().map {
-                users.add(
-                    User(
-                        id = it[UserDAO.id],
-                        username = it[UserDAO.username],
-                        email = it[UserDAO.email],
-                        password = it[UserDAO.password],
-                        verfied = it[UserDAO.verfied],
-                        birthdate = it[UserDAO.birthdate]
-                    )
-                )
-            }
-        }
-
-        return users
-    }
 
     fun insert(user: UserDTO) {
 

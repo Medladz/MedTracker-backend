@@ -40,7 +40,7 @@ create table "drug"(
     "thumbnailURL" varchar(255) NOT NULL,
     FOREIGN KEY ("creatorID") REFERENCES "user" ("ID") ON DELETE CASCADE ON UPDATE NO ACTION,
     FOREIGN KEY ("brandID") REFERENCES "brand" ("ID") ON DELETE CASCADE ON UPDATE NO ACTION,
-    FOREIGN KEY ("sourceID") REFERENCES "source" ("ID") ON DELETE CASCADE ON UPDATE NO ACTION,
+    FOREIGN KEY ("sourceID") REFERENCES "source" ("ID") ON DELETE CASCADE ON UPDATE NO ACTION
 );
 create table "drugComponent"(
     "drugID" INT NOT NULL,

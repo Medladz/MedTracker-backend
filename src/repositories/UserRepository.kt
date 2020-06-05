@@ -1,13 +1,24 @@
 package com.medtracker.repositories
 
-import org.jetbrains.exposed.sql.Table
+import com.medtracker.models.User
+import com.medtracker.repositories.dao.UserDAO
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.transactions.transaction
+
+class UserRepository {
+
+    fun getAllVerifiedUserIds(): ArrayList<Int>{
+        val userIds: ArrayList<Int> = arrayListOf()
+        transaction {
+            UserDAO.slice(UserDAO.id).select{UserDAO.verfied eq true}.map {
+                userIds.add(it[UserDAO.id])
+            }
+        }
+
+        return userIds
+    }
 
 
-object UserDAO : Table("user") {
-    val id = integer("id").primaryKey()
-    val username = text("username")
-    val email = text("email")
-    val password = text("password")
-    val verfied = bool("verfied")
-    val birthdate = date("birthdate")
 }

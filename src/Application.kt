@@ -46,26 +46,27 @@ fun Application.module(testing: Boolean = false) {
 
     routing {
 
+
         val userController = UserController()
         val drugController = DrugController()
         val drugComponentController = DrugComponentController()
 
-        get("/users") {
-            val userData = userController.getAll()
-
-            call.respond(userData)
-
-        }
+//        get("/users") {
+//            val userData = userController.getAll()
+//
+//            call.respond(userData)
+//
+//        }
 
         get("/drugs"){
             val drugData  = drugController.getAll()
             var drugComponentData: ArrayList<ArrayList<DrugComponent>> = ArrayList()
             drugData.forEach(){
-                drugComponentData.add((it.id)-1, drugComponentController.getAll(it.id))
+                drugComponentData.add((drugData.indexOf(it)), drugComponentController.getAll(it.id))
             }
             drugData.forEach() {
-                if(drugComponentData[(it.id)-1].isEmpty()){
-                    drugComponentData.add((it.id)-1, DrugComponent(0, 0, 0.00, 0, "null"))
+                if(drugComponentData[(drugData.indexOf(it))].isEmpty()){
+                    drugComponentData.add((drugData.indexOf(it)), DrugComponent(0, 0, 0.00, 0, "null"))
                 }
 
             }
@@ -92,7 +93,7 @@ fun Application.module(testing: Boolean = false) {
                                 "type" to "users",
                                 "id" to it.creatorID
                             ),
-                            "components" to drugComponentData[(it.id)-1].map{
+                            "components" to drugComponentData[(drugData.indexOf(it))].map{
                                 obj(
                                     "type" to "drugComponents",
                                     "id" to it.componentID

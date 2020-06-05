@@ -3,6 +3,8 @@ package com.medtracker.controllers
 import com.medtracker.models.Drug
 import com.medtracker.models.DrugDTO
 import com.medtracker.repositories.DrugDAO
+import com.medtracker.services.DrugService
+import com.medtracker.services.UserService
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
@@ -11,36 +13,20 @@ import org.jetbrains.exposed.sql.update
 
 class DrugController {
 
-    fun getAll(): ArrayList<Drug> {
-        val drugs: ArrayList<Drug> = arrayListOf()
-        transaction {
-            DrugDAO.selectAll().map {
-                drugs.add(
-                    Drug(
-                        id = it[DrugDAO.id],
-                        creatorID = it[DrugDAO.creatorID],
-                        brandID = it[DrugDAO.brandID],
-                        sourceID = it[DrugDAO.sourceID],
-                        name = it[DrugDAO.name],
-                        thumbnailURL = it[DrugDAO.thumbnailURL]
-                    )
-                )
-            }
-        }
 
-        return drugs
+    fun getAll(): ArrayList<Drug> {
+        val drugService = DrugService()
+        val userService = UserService()
+
+        val creatorIds = userService.getAllVerifiedUserIds()
+        val drugResponse = drugService.getAllByCreators(creatorIds)
+
+        return drugResponse
     }
     fun insert(drug: DrugDTO) {
+        val drugService = DrugService()
 
-        transaction {
-            DrugDAO.insert {
-                it[creatorID] = drug.creatorID
-                it[brandID] = drug.brandID
-                it[sourceID] = drug.sourceID
-                it[name] = drug.name
-                it[thumbnailURL] = drug.thumbnailURL
-            }
-        }
+        drugService
     }
 
     fun update(drug: DrugDTO, ID: Int) {
