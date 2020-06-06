@@ -13,12 +13,14 @@ import com.zaxxer.hikari.HikariDataSource
 import org.jetbrains.exposed.sql.Database
 import io.ktor.locations.*
 import com.beust.klaxon.*
+import com.medtracker.controllers.AgendaController
 import com.medtracker.controllers.DrugComponentController
 import com.medtracker.controllers.DrugController
 import com.medtracker.controllers.UserController
-import com.medtracker.models.DrugComponent
+import com.medtracker.models.DrugComponentDTO
 import com.medtracker.models.DrugDTO
 import com.medtracker.models.UserDTO
+import com.medtracker.services.dto.AgendaRDTO
 import kotlin.text.*
 import java.util.ArrayList
 
@@ -58,6 +60,15 @@ fun Application.module(testing: Boolean = false) {
             call.respond(drugData)
         }
 
+        post("/agendaentry") {
+            val agendaController = AgendaController()
+            val agendaRDTO = call.receive<AgendaRDTO>()
+
+            agendaController.createAgendaEntry(agendaRDTO)
+            call.respond(agendaRDTO)
+        }
+
+//        post<
 
 //        val userController = UserController()
 //        val drugController = DrugController()
@@ -138,11 +149,7 @@ fun Application.module(testing: Boolean = false) {
 //            userController.insert(userDTO)
 //            call.respond(userDTO)
 //        }
-//        post("/drug") {
-//            val drugDTO = call.receive<DrugDTO>()
-//            drugController.insert(drugDTO)
-//            call.respond(drugDTO)
-//        }
+
 
 //        put("/user/{id}") {
 //            val ID: Int = call.parameters["ID"].toString().toInt()

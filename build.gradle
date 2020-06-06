@@ -5,6 +5,7 @@ buildscript {
     
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath("org.postgresql:postgresql:42.2.5")
     }
 }
 
@@ -39,8 +40,8 @@ dependencies {
     implementation 'org.jetbrains.exposed:exposed:0.17.7'
     implementation 'com.beust:klaxon:5.0.5'
     implementation "io.ktor:ktor-locations:$ktor_version"
-
-    runtime group: 'org.postgresql', name: 'postgresql', version: '42.1.4'
+    implementation "org.postgresql:postgresql:42.2.5"
+    runtime group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
 
     testImplementation "io.ktor:ktor-server-tests:$ktor_version"
 }
