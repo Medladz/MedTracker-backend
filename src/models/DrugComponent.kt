@@ -1,15 +1,6 @@
 package com.medtracker.models
 
-
-data class DrugComponent(
-    var drugID: Int,
-    var componentID: Int,
-    var purity: Double,
-    var quantity: Int,
-    var measurementUnit: String
-
-)
-
+// @todo dit moet naar dto map en RDTO en FDTO van maken
 data class DrugComponentDTO(
     val componentID: Int,
     val purity: Double,

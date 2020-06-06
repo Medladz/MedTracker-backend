@@ -1,12 +1,13 @@
 package com.medtracker.repositories.dao
 
+import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.Table
 
 object DrugDAO : Table("drug") {
-    val id = integer("id").primaryKey()
-    val creatorID = integer("creatorID")
-    val brandID = integer("brandID")
-    val sourceID = integer("sourceID")
-    val name = text("name")
-    val thumbnailURL = text("thumbnailURL")
+    val id: Column<Int> = integer("\"ID\"").primaryKey()
+    val creatorId: Column<Int?> = integer("creatorID").references(UserDAO.id).nullable()
+    val brandId: Column<Int?> = integer("brandID").references(BrandDAO.id).nullable()
+    val sourceId: Column<Int?> = integer("sourceID").references(SourceDAO.id).nullable()
+    val name: Column<String> = varchar("name", 255)
+    val thumbnailURL: Column<String?> = varchar("thumbnailURL", 255).nullable()
 }

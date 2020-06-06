@@ -4,8 +4,8 @@ CREATE TABLE "user"(
     "username" varchar(255) UNIQUE NOT NULL,
     "email" varchar(255) UNIQUE NOT NULL,
     "password" varchar(255) NOT NULL,
-    "verfied" boolean NOT NULL,
-    "birthdate" date NOT NULL
+    "verified" boolean NOT NULL,
+    "birthday" date NOT NULL
 );
 create table "brand" (
     "ID" SERIAL PRIMARY KEY,
@@ -37,7 +37,7 @@ create table "drug"(
     "brandID" INT,
     "sourceID" INT,
     "name" varchar(255) NOT NULL,
-    "thumbnailURL" varchar(255) NOT NULL,
+    "thumbnailURL" varchar(255),
     FOREIGN KEY ("creatorID") REFERENCES "user" ("ID") ON DELETE CASCADE ON UPDATE NO ACTION,
     FOREIGN KEY ("brandID") REFERENCES "brand" ("ID") ON DELETE CASCADE ON UPDATE NO ACTION,
     FOREIGN KEY ("sourceID") REFERENCES "source" ("ID") ON DELETE CASCADE ON UPDATE NO ACTION
