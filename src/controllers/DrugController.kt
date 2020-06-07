@@ -12,7 +12,7 @@ import org.jetbrains.exposed.sql.update
 
 class DrugController {
 
-    fun getAllByCreator(creatorId: Int, withVerified: Boolean, includedResources: List<String> ): ArrayList<Drug> {
+    fun getAllByCreator(creatorId: Int, withVerified: Boolean, includedResources: List<String>? ): ArrayList<Drug> {
         val drugService = DrugService()
 
         val drugs = drugService.getAllByCreator(creatorId, withVerified, includedResources)

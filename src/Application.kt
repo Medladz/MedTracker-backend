@@ -11,7 +11,6 @@ import io.ktor.features.*
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.jetbrains.exposed.sql.Database
-import io.ktor.locations.*
 import com.beust.klaxon.*
 import com.medtracker.controllers.AgendaController
 import com.medtracker.controllers.DrugComponentController
@@ -21,6 +20,9 @@ import com.medtracker.models.DrugComponentDTO
 import com.medtracker.models.DrugDTO
 import com.medtracker.models.UserDTO
 import com.medtracker.services.dto.AgendaRDTO
+import java.lang.Exception
+import java.lang.IllegalArgumentException
+import java.lang.NumberFormatException
 import kotlin.text.*
 import java.util.ArrayList
 
@@ -39,8 +41,6 @@ fun Application.module(testing: Boolean = false) {
         Database.connect(ds)
     }
 
-    install(Locations)
-
     install(ContentNegotiation) {
         jackson {
             enable(SerializationFeature.INDENT_OUTPUT)
@@ -50,14 +50,28 @@ fun Application.module(testing: Boolean = false) {
     initDB()
 
     routing {
-        get<Creators.Drugs> { drugs ->
-            val drugController = DrugController()
+        get("/creators/{creatorId}/drugs") {
+            try {
+                val drugController = DrugController()
 
-            val includedResources =  drugs.include.split(",")
+                val creatorId = call.parameters["creatorId"]?.toInt()
+                val withVerified = call.request.queryParameters["withVerified"]?.toBoolean() ?: true
+                val includedResources = call.request.queryParameters["include"]?.split(",")
 
-            val drugData = drugController.getAllByCreator( drugs.parent.creatorId, drugs.withVerified, includedResources)
+                if (creatorId === null)
+                    throw IllegalArgumentException()
 
-            call.respond(drugData)
+                val drugData = drugController.getAllByCreator(creatorId, withVerified, includedResources)
+
+                call.respond(drugData)
+            } catch (e: Exception) {
+                val statusCode = when (e) {
+                    is IllegalArgumentException, is NumberFormatException -> HttpStatusCode.BadRequest
+                    else -> throw e;
+                }
+
+                call.respond(statusCode)
+            }
         }
 
         post("/agendaentry") {
@@ -181,7 +195,3 @@ fun Application.module(testing: Boolean = false) {
 //private fun <E> ArrayList<E>.add(index: Int, element: DrugComponent) {
 //
 //}
-
-@Location("/creators/{creatorId}") data class Creators(val creatorId: Int) {
-    @Location("/drugs") data class Drugs(val parent: Creators, val withVerified: Boolean = true, val include: String = "")
-}

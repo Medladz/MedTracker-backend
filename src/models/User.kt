@@ -4,12 +4,12 @@ import org.joda.time.DateTime
 import java.util.*
 
 class User(
-    val id: Int? = null,
-    val username: String? = null,
-    val email: String? = null,
-    val password: String? = null,
-    val verified: Boolean? = null,
-    val birthday: DateTime? = null
+    var id: Int? = null,
+    var username: String? = null,
+    var email: String? = null,
+    var password: String? = null,
+    var verified: Boolean? = null,
+    var birthday: DateTime? = null
 ) {
 
 }
