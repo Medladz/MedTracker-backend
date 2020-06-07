@@ -4,7 +4,6 @@ import io.ktor.application.*
 import io.ktor.response.*
 import io.ktor.request.*
 import io.ktor.routing.*
-import io.ktor.http.*
 import com.fasterxml.jackson.databind.*
 import io.ktor.jackson.*
 import io.ktor.features.*
@@ -13,19 +12,13 @@ import com.zaxxer.hikari.HikariDataSource
 import org.jetbrains.exposed.sql.Database
 import com.beust.klaxon.*
 import com.medtracker.controllers.AgendaController
-import com.medtracker.controllers.DrugComponentController
 import com.medtracker.controllers.DrugController
-import com.medtracker.controllers.UserController
-import com.medtracker.models.DrugComponentDTO
-import com.medtracker.models.DrugDTO
-import com.medtracker.models.UserDTO
-import com.medtracker.services.dto.AgendaRDTO
 import java.lang.Exception
 import java.lang.IllegalArgumentException
 import java.lang.NumberFormatException
+import com.medtracker.services.dto.AgendaFDTO
+import io.ktor.http.HttpStatusCode
 import kotlin.text.*
-import java.util.ArrayList
-
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
@@ -58,8 +51,9 @@ fun Application.module(testing: Boolean = false) {
                 val withVerified = call.request.queryParameters["withVerified"]?.toBoolean() ?: true
                 val includedResources = call.request.queryParameters["include"]?.split(",")
 
-                if (creatorId === null)
+                if (creatorId === null) {
                     throw IllegalArgumentException()
+                }
 
                 val drugData = drugController.getAllByCreator(creatorId, withVerified, includedResources)
 
@@ -74,15 +68,13 @@ fun Application.module(testing: Boolean = false) {
             }
         }
 
-        post("/agendaentry") {
+        post("/agendaentry"){
             val agendaController = AgendaController()
-            val agendaRDTO = call.receive<AgendaRDTO>()
+            val AgendaFDTO = call.receive<AgendaFDTO>()
 
-            agendaController.createAgendaEntry(agendaRDTO)
-            call.respond(agendaRDTO)
+            agendaController.createAgendaEntry(AgendaFDTO)
+            call.respond(AgendaFDTO)
         }
-
-//        post<
 
 //        val userController = UserController()
 //        val drugController = DrugController()
@@ -102,7 +94,6 @@ fun Application.module(testing: Boolean = false) {
 //            val withVerified: Boolean = call.request.queryParameters["withVerified"]?.toBoolean() ?: false
 //            val includedResourcesParts = includedResources?.let { includedResources.split(",") }
 //
-//            // @todo creatorID uit url halen
 //            val creatorID = 2
 //
 //            val drugData = drugController.getAll(includedResourcesParts, creatorID)
@@ -193,5 +184,3 @@ fun Application.module(testing: Boolean = false) {
 }
 
 //private fun <E> ArrayList<E>.add(index: Int, element: DrugComponent) {
-//
-//}
