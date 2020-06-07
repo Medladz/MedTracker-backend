@@ -1,16 +1,17 @@
 package com.medtracker.services
 
-import com.medtracker.models.Drug
+import com.medtracker.models.Agenda
 import com.medtracker.repositories.AgendaRepository
-import com.medtracker.repositories.DrugRepository
-import com.medtracker.services.dto.AgendaRDTO
+import com.medtracker.services.FDTOParsers.AgendaParser
+import com.medtracker.services.dto.AgendaFDTO
 
 class AgendaService {
 
-    fun createAgendaEntry(agenda: AgendaRDTO) {
+    fun createAgendaEntry(agendaFDTO: AgendaFDTO) {
         val agendaRepository = AgendaRepository()
-
-        return agendaRepository.createAgendaEntry(agenda)
+        val agendaParser = AgendaParser(Agenda())
+        agendaParser.parse(agendaFDTO)
+        return agendaRepository.createAgendaEntry(agendaParser.agenda)
     }
 
 }

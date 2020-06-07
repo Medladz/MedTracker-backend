@@ -4,7 +4,6 @@ import io.ktor.application.*
 import io.ktor.response.*
 import io.ktor.request.*
 import io.ktor.routing.*
-import io.ktor.http.*
 import com.fasterxml.jackson.databind.*
 import io.ktor.jackson.*
 import io.ktor.features.*
@@ -12,17 +11,11 @@ import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.jetbrains.exposed.sql.Database
 import io.ktor.locations.*
-import com.beust.klaxon.*
 import com.medtracker.controllers.AgendaController
-import com.medtracker.controllers.DrugComponentController
 import com.medtracker.controllers.DrugController
-import com.medtracker.controllers.UserController
-import com.medtracker.models.DrugComponentDTO
 import com.medtracker.models.DrugDTO
-import com.medtracker.models.UserDTO
-import com.medtracker.services.dto.AgendaRDTO
+import com.medtracker.services.dto.AgendaFDTO
 import kotlin.text.*
-import java.util.ArrayList
 
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
@@ -50,25 +43,15 @@ fun Application.module(testing: Boolean = false) {
     initDB()
 
     routing {
-        get<Creators.Drugs> { drugs ->
-            val drugController = DrugController()
 
-            val includedResources =  drugs.include.split(",")
 
-            val drugData = drugController.getAllByCreator( drugs.parent.creatorId, drugs.withVerified, includedResources)
-
-            call.respond(drugData)
-        }
-
-        post("/agendaentry") {
+        post("/agendaentry"){
             val agendaController = AgendaController()
-            val agendaRDTO = call.receive<AgendaRDTO>()
+            val AgendaFDTO = call.receive<AgendaFDTO>()
 
-            agendaController.createAgendaEntry(agendaRDTO)
-            call.respond(agendaRDTO)
+            agendaController.createAgendaEntry(AgendaFDTO)
+            call.respond(AgendaFDTO)
         }
-
-//        post<
 
 //        val userController = UserController()
 //        val drugController = DrugController()
@@ -182,6 +165,5 @@ fun Application.module(testing: Boolean = false) {
 //
 //}
 
-@Location("/creators/{creatorId}") data class Creators(val creatorId: Int) {
-    @Location("/drugs") data class Drugs(val parent: Creators, val withVerified: Boolean = true, val include: String = "")
-}
+
+

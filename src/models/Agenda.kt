@@ -1,16 +1,16 @@
 package com.medtracker.models
 
+import com.medtracker.repositories.dao.WeightOrVolume
 import org.joda.time.DateTime
-import org.w3c.dom.Text
-import java.sql.Timestamp
 
 class Agenda(
     var id: Int? = null,
-    var creatorID: Int? = null,
-    var drugID: Int? = null,
+    var creator: User? = null,
+    var drug: Drug? = null,
+    var container: Container? = null,
     var title: String? = null,
-    var note: Text? = null,
+    var note: String? = null,
     var quantity: Int? = null,
-    var measurementUnit: String? = null,
+    var measurementUnit: WeightOrVolume? = null,
     var consumedAt: DateTime? = null
 )

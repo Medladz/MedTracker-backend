@@ -1,7 +1,6 @@
 package com.medtracker.models
 
 import org.joda.time.DateTime
-import java.util.*
 
 class User(
     val id: Int? = null,
