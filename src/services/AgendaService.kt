@@ -14,4 +14,8 @@ class AgendaService {
         return agendaRepository.createAgendaEntry(agendaParser.agenda)
     }
 
+    fun getAgendaEntriesByCreator(creatorId: Int): ArrayList<Agenda> {
+        val agendaRepository = AgendaRepository()
+        return agendaRepository.getAgendaEntriesByCreator(creatorId)
+    }
 }

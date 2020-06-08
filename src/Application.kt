@@ -75,17 +75,20 @@ fun Application.module(testing: Boolean = false) {
             agendaController.createAgendaEntry(AgendaFDTO)
             call.respond(AgendaFDTO)
         }
+        get("/agendaentries/{creatorId}") {
+            val agendaController = AgendaController()
 
+            val creatorId = call.parameters["creatorId"].toString().toInt()
+
+            val AgendaEntries = agendaController.getAgendaEntriesByCreator(creatorId)
+            call.respond(AgendaEntries)
+
+        }
 //        val userController = UserController()
 //        val drugController = DrugController()
 //        val drugComponentController = DrugComponentController()
 
-//        get("/users") {
-//            val userData = userController.getAll()
-//
-//            call.respond(userData)
-//
-//        }
+
 
 //        get("/creators/{creatorId}/drugs") {
 //            val drugController = DrugController()
