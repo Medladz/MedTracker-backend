@@ -123,7 +123,7 @@ class DrugRepository {
             .adjustSlice { slice(fields - BrandDAO.columns) }
     }
 
-    // Get the brand record of the drug
+    // Get the source record of the drug
     private fun withSource(query: Query) {
         query.adjustColumnSet { leftJoin(SourceDAO, { DrugDAO.sourceId }, { id }) }
             .adjustSlice { slice(columns +  fields) }

@@ -10,14 +10,26 @@ import io.ktor.features.*
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.jetbrains.exposed.sql.Database
-import com.beust.klaxon.*
 import com.medtracker.controllers.AgendaController
 import com.medtracker.controllers.DrugController
+import com.medtracker.controllers.UserController
+import com.medtracker.models.User
+import com.medtracker.models.UserDTO
+import com.medtracker.repositories.DrugComponentDAO
+import com.medtracker.repositories.dao.DrugDAO
+import com.medtracker.repositories.dao.UserDAO
 import java.lang.Exception
 import java.lang.IllegalArgumentException
 import java.lang.NumberFormatException
 import com.medtracker.services.dto.AgendaFDTO
+import io.ktor.auth.*
 import io.ktor.http.HttpStatusCode
+import io.ktor.util.getDigestFunction
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.transactions.transaction
+import java.util.*
 import kotlin.text.*
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
@@ -34,6 +46,20 @@ fun Application.module(testing: Boolean = false) {
         Database.connect(ds)
     }
 
+//    install(Authentication) {
+//        basic("Login") {
+//            realm = "ktor"
+//            validate { credentials ->
+//                if (credentials.password == "${credentials.name}123"){
+//                    UserIdPrincipal(credentials.name)
+//
+//                }else{
+//                    null
+//                }
+//
+//            }
+//        }
+//    }
     install(ContentNegotiation) {
         jackson {
             enable(SerializationFeature.INDENT_OUTPUT)
@@ -43,6 +69,7 @@ fun Application.module(testing: Boolean = false) {
     initDB()
 
     routing {
+
         get("/creators/{creatorId}/drugs") {
             try {
                 val drugController = DrugController()
@@ -75,19 +102,45 @@ fun Application.module(testing: Boolean = false) {
             agendaController.createAgendaEntry(AgendaFDTO)
             call.respond(AgendaFDTO)
         }
+
+        post("/login"){
+            val userData = call.receive<User>()
+            var userID :Int = 0
+            transaction{
+                UserDAO.select{( UserDAO.email eq userData.email.toString()) and (UserDAO.password eq userData.password.toString()) }.map{
+                    userID = it[UserDAO.id]
+                }
+            }
+            call.respond(userID)
+        }
         get("/agendaentries/{creatorId}") {
             val agendaController = AgendaController()
 
             val creatorId = call.parameters["creatorId"].toString().toInt()
+            val includedResources: List<String>? = call.request.queryParameters["include"]?.split(",")
 
-            val AgendaEntries = agendaController.getAgendaEntriesByCreator(creatorId)
+
+            val AgendaEntries = agendaController.getAgendaEntriesByCreator(creatorId,includedResources)
             call.respond(AgendaEntries)
 
+        }
+
+//        authenticate("checkuser") {
+//            post("login"){
+//                val userController = UserController()
+//                val includedResources: List<String>? = call.request.queryParameters["include"]?.split(",")
+//                val accesToken = userController.login(includedResources)
+//            }
+//        }
+        post("/user") {
+            val userController = UserController()
+            val userDTO = call.receive<UserDTO>()
+            userController.insert(userDTO)
+            call.respond(userDTO)
         }
 //        val userController = UserController()
 //        val drugController = DrugController()
 //        val drugComponentController = DrugComponentController()
-
 
 
 //        get("/creators/{creatorId}/drugs") {
@@ -152,11 +205,7 @@ fun Application.module(testing: Boolean = false) {
 //        }
 
 
-//        post("/user") {
-//            val userDTO = call.receive<UserDTO>()
-//            userController.insert(userDTO)
-//            call.respond(userDTO)
-//        }
+
 
 
 //        put("/user/{id}") {
