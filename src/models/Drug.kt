@@ -11,9 +11,7 @@ class Drug(
     var source: Source? = null,
     var components: ArrayList<Drug>? = null,
     var creator: User? = null
-) {
-
-}
+)
 
 // @todo dit moet naar dto map en RDTO en FDTO van maken
 data class DrugDTO(

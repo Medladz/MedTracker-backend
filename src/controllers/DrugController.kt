@@ -1,25 +1,22 @@
 package com.medtracker.controllers
 
 import com.medtracker.models.Drug
-import com.medtracker.models.DrugDTO
 import com.medtracker.services.DrugService
-import com.medtracker.services.UserService
-import org.jetbrains.exposed.sql.deleteWhere
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.selectAll
-import org.jetbrains.exposed.sql.transactions.transaction
-import org.jetbrains.exposed.sql.update
+import com.medtracker.services.FDTOParsers.DrugsParser
+import com.medtracker.services.dto.DrugsRDTO
 
 class DrugController {
 
     fun getAllByCreator(creatorId: Int, withVerified: Boolean, includedResources: List<String>? ): ArrayList<Drug> {
         val drugService = DrugService()
+        val drugsRDTO = DrugsRDTO()
+        val drugsParser =  DrugsParser(drugsRDTO)
 
         val drugs = drugService.getAllByCreator(creatorId, withVerified, includedResources)
 
-        // @todo service om model om te zetten naar RDTO om als response terug te sturen
-
+//        drugsParser.parse(drugs)
         return drugs
+//        return drugsRDTO
     }
 
 //    fun insert(drug: DrugDTO) {

@@ -18,6 +18,5 @@ class AgendaParser(val agenda : Agenda) {
         agenda.quantity = agendaFDTO.quantity
         agenda.measurementUnit = agendaFDTO.measurementUnit
         agenda.consumedAt = DateTime.parse(agendaFDTO.consumedAt)
-
     }
 }
