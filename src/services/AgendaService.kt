@@ -18,4 +18,14 @@ class AgendaService {
         val agendaRepository = AgendaRepository()
         return agendaRepository.getAgendaEntriesByCreator(creatorId, includedResources)
     }
+
+    fun updateAgendaEntry(agendaId: Int, agenda: Agenda){
+        val agendaRepository = AgendaRepository()
+        val agendaEntry = agendaRepository.updateAgendaEntry(agendaId, agenda)
+        return agendaEntry
+    }
+    fun deleteAgendaEntry(agendaId: Int){
+        val agendaRepository = AgendaRepository()
+        agendaRepository.deleteAgendaEntry(agendaId)
+    }
 }

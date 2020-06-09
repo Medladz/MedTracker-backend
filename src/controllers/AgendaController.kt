@@ -16,5 +16,13 @@ class AgendaController {
         val agendaEntries = agendaService.getAgendaEntriesByCreator(creatorId, includedResources)
         return agendaEntries
     }
-
+    fun updateAgendaEntry(agendaId: Int, agenda: Agenda){
+        val agendaService = AgendaService()
+        val agendaEntries = agendaService.updateAgendaEntry(agendaId, agenda)
+        return agendaEntries
+    }
+    fun deleteAgendaEntry(agendaId: Int){
+        val agendaService = AgendaService()
+        agendaService.deleteAgendaEntry(agendaId)
+    }
 }

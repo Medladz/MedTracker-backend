@@ -76,6 +76,27 @@ class AgendaRepository {
         }
         return agendaEntries
     }
+
+    fun updateAgendaEntry(agendaId: Int, agendaEntry: Agenda){
+        transaction {
+            AgendaDAO.update({ AgendaDAO.id eq agendaId }) {
+                it[creatorID] = toInt(agendaEntry.creator?.id.toString())
+                it[drugID] = toInt(agendaEntry.drug?.id.toString())
+                it[containerID] = agendaEntry.container?.id
+                it[title] = agendaEntry.title
+                it[note] = agendaEntry.note
+                it[quantity] = agendaEntry.quantity
+                it[measurementUnit] = agendaEntry.measurementUnit
+                it[consumedAt] = DateTime.parse(agendaEntry.consumedAt.toString())
+            }
+        }
+    }
+    fun deleteAgendaEntry(agendaId: Int){
+        transaction {
+            AgendaDAO.deleteWhere { AgendaDAO.id eq agendaId }
+        }
+    }
+
     // Get the Drug record of the Agenda
     private fun withDrug(query: Query) {
         query.adjustColumnSet { leftJoin(DrugDAO, { AgendaDAO.drugID }, { id }) }

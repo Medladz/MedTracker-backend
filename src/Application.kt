@@ -13,6 +13,7 @@ import org.jetbrains.exposed.sql.Database
 import com.medtracker.controllers.AgendaController
 import com.medtracker.controllers.DrugController
 import com.medtracker.controllers.UserController
+import com.medtracker.models.Agenda
 import com.medtracker.models.User
 import com.medtracker.models.UserDTO
 import com.medtracker.repositories.DrugComponentDAO
@@ -46,20 +47,6 @@ fun Application.module(testing: Boolean = false) {
         Database.connect(ds)
     }
 
-//    install(Authentication) {
-//        basic("Login") {
-//            realm = "ktor"
-//            validate { credentials ->
-//                if (credentials.password == "${credentials.name}123"){
-//                    UserIdPrincipal(credentials.name)
-//
-//                }else{
-//                    null
-//                }
-//
-//            }
-//        }
-//    }
     install(ContentNegotiation) {
         jackson {
             enable(SerializationFeature.INDENT_OUTPUT)
@@ -77,11 +64,9 @@ fun Application.module(testing: Boolean = false) {
                 val creatorId = call.parameters["creatorId"]?.toInt()
                 val withVerified = call.request.queryParameters["withVerified"]?.toBoolean() ?: true
                 val includedResources = call.request.queryParameters["include"]?.split(",")
-
                 if (creatorId === null) {
                     throw IllegalArgumentException()
                 }
-
                 val drugData = drugController.getAllByCreator(creatorId, withVerified, includedResources)
 
                 call.respond(drugData)
@@ -90,9 +75,16 @@ fun Application.module(testing: Boolean = false) {
                     is IllegalArgumentException, is NumberFormatException -> HttpStatusCode.BadRequest
                     else -> throw e;
                 }
-
                 call.respond(statusCode)
             }
+        }
+
+        put("/agendaentry/{id}") {
+            val agendaController = AgendaController()
+            val agendaId: Int = call.parameters["id"].toString().toInt()
+            val agenda = call.receive<Agenda>()
+            agendaController.updateAgendaEntry(agendaId,agenda)
+            call.respond(agenda)
         }
 
         post("/agendaentry"){
@@ -101,6 +93,21 @@ fun Application.module(testing: Boolean = false) {
 
             agendaController.createAgendaEntry(AgendaFDTO)
             call.respond(AgendaFDTO)
+        }
+        get("/agendaentries/{creatorId}") {
+            val agendaController = AgendaController()
+            val creatorId = call.parameters["creatorId"].toString().toInt()
+            val includedResources: List<String>? = call.request.queryParameters["include"]?.split(",")
+            val AgendaEntries = agendaController.getAgendaEntriesByCreator(creatorId,includedResources)
+
+            call.respond(AgendaEntries)
+        }
+
+        delete("/agendaentry/{id}") {
+            val agendaController = AgendaController()
+            val agendaId: Int = call.parameters["id"].toString().toInt()
+            agendaController.deleteAgendaEntry(agendaId)
+            call.respond(HttpStatusCode.OK)
         }
 
         post("/login"){
@@ -113,25 +120,8 @@ fun Application.module(testing: Boolean = false) {
             }
             call.respond(userID)
         }
-        get("/agendaentries/{creatorId}") {
-            val agendaController = AgendaController()
-
-            val creatorId = call.parameters["creatorId"].toString().toInt()
-            val includedResources: List<String>? = call.request.queryParameters["include"]?.split(",")
 
 
-            val AgendaEntries = agendaController.getAgendaEntriesByCreator(creatorId,includedResources)
-            call.respond(AgendaEntries)
-
-        }
-
-//        authenticate("checkuser") {
-//            post("login"){
-//                val userController = UserController()
-//                val includedResources: List<String>? = call.request.queryParameters["include"]?.split(",")
-//                val accesToken = userController.login(includedResources)
-//            }
-//        }
         post("/user") {
             val userController = UserController()
             val userDTO = call.receive<UserDTO>()
