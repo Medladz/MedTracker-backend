@@ -10,7 +10,7 @@ object ContainerDAO : Table("container"){
     val quantity: Column<Int> = integer("quantity")
     // @todo change to ENUM weightOrVolume
     val measurementUnit: Column<String> = text("measurementUnit")
-    val thumbnailUrl: Column<String> = varchar("thumbnailUrl", 255)
+    val thumbnailURL: Column<String> = varchar("thumbnailURL", 255)
 
     init {
         uniqueIndex(creatorId, name)

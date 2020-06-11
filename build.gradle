@@ -39,6 +39,7 @@ dependencies {
     implementation 'org.jetbrains.exposed:exposed:0.17.7'
     implementation 'com.beust:klaxon:5.0.5'
     implementation "org.postgresql:postgresql:42.2.5"
-
+    implementation 'com.auth0:java-jwt:3.10.3'
+    implementation "io.ktor:ktor-auth:$ktor_version"
     testImplementation "io.ktor:ktor-server-tests:$ktor_version"
 }

@@ -102,7 +102,7 @@ class DrugRepository(
         fields += BrandDAO.columns
     }
 
-    // Get the brand record of the drug
+    // Get the source record of the drug
     private fun withSource(query: Query, fields: MutableList<Column<*>>) {
         query.adjustColumnSet { leftJoin(SourceDAO, { DrugDAO.sourceId }, { id }) }
         fields += SourceDAO.columns
