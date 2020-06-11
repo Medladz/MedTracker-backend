@@ -1,0 +1,31 @@
+package com.medtracker.services
+
+import com.medtracker.models.Agenda
+import com.medtracker.repositories.AgendaRepository
+import com.medtracker.services.FDTOParsers.AgendaParser
+import com.medtracker.services.dto.AgendaFDTO
+
+class AgendaService {
+
+    fun createAgendaEntry(agendaFDTO: AgendaFDTO) {
+        val agendaRepository = AgendaRepository()
+        val agendaParser = AgendaParser(Agenda())
+        agendaParser.parse(agendaFDTO)
+        return agendaRepository.createAgendaEntry(agendaParser.agenda)
+    }
+
+    fun getAgendaEntriesByCreator(creatorId: Int, includedResources: List<String>?): ArrayList<Agenda> {
+        val agendaRepository = AgendaRepository()
+        return agendaRepository.getAgendaEntriesByCreator(creatorId, includedResources)
+    }
+
+    fun updateAgendaEntry(agendaId: Int, agenda: Agenda){
+        val agendaRepository = AgendaRepository()
+        val agendaEntry = agendaRepository.updateAgendaEntry(agendaId, agenda)
+        return agendaEntry
+    }
+    fun deleteAgendaEntry(agendaId: Int){
+        val agendaRepository = AgendaRepository()
+        agendaRepository.deleteAgendaEntry(agendaId)
+    }
+}
