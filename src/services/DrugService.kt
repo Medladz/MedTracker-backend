@@ -6,9 +6,9 @@ import com.medtracker.repositories.DrugRepository
 class DrugService {
 
     fun getAllByCreator(creatorId: Int, withVerified: Boolean, includedResources: List<String>?): ArrayList<Drug> {
-        val drugRepository = DrugRepository()
+        val drugRepository = DrugRepository(includedResources, withVerified)
 
-        return drugRepository.getAllByCreator(creatorId, withVerified, includedResources)
+        return drugRepository.getAllByCreator(creatorId)
     }
 
 

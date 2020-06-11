@@ -1,22 +1,20 @@
 package com.medtracker.controllers
 
-import com.medtracker.models.Drug
 import com.medtracker.services.DrugService
 import com.medtracker.services.FDTOParsers.DrugsParser
-import com.medtracker.services.dto.DrugsRDTO
+import com.medtracker.services.dto.DrugRDTO
+import com.medtracker.services.dto.DrugRelationshipsRDTO
+import com.medtracker.services.dto.ResourcesResponseRDTO
 
 class DrugController {
 
-    fun getAllByCreator(creatorId: Int, withVerified: Boolean, includedResources: List<String>? ): ArrayList<Drug> {
+    fun getAllByCreator(creatorId: Int, withVerified: Boolean, includedResources: List<String>? ): ResourcesResponseRDTO<DrugRDTO, DrugRelationshipsRDTO> {
         val drugService = DrugService()
-        val drugsRDTO = DrugsRDTO()
-        val drugsParser =  DrugsParser(drugsRDTO)
+        val drugsParser = DrugsParser(includedResources)
 
-        val drugs = drugService.getAllByCreator(creatorId, withVerified, includedResources)
+        val drugs= drugService.getAllByCreator(creatorId, withVerified, includedResources)
 
-//        drugsParser.parse(drugs)
-        return drugs
-//        return drugsRDTO
+       return drugsParser.parse(drugs)
     }
 
 //    fun insert(drug: DrugDTO) {
