@@ -16,8 +16,6 @@ import com.medtracker.controllers.UserController
 import com.medtracker.models.Agenda
 import com.medtracker.models.User
 import com.medtracker.models.UserDTO
-import com.medtracker.repositories.DrugComponentDAO
-import com.medtracker.repositories.dao.DrugDAO
 import com.medtracker.repositories.dao.UserDAO
 import java.lang.Exception
 import java.lang.IllegalArgumentException

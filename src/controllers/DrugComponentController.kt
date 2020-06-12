@@ -1,7 +1,5 @@
 package com.medtracker.controllers
 
-import com.medtracker.models.DrugComponentDTO
-import com.medtracker.repositories.DrugComponentDAO
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 

@@ -6,7 +6,7 @@ import org.joda.time.DateTime
 
 object UserDAO : Table("user") {
     val id: Column<Int> = integer("\"ID\"").primaryKey()
-    val username: Column<String> = varchar("username", 255).uniqueIndex()
+    val username: Column<String> = varchar("username", 255)
     val email: Column<String> = varchar("email", 255).uniqueIndex()
     val password: Column<String> = varchar("password", 255)
     val verified: Column<Boolean> = bool("verified")

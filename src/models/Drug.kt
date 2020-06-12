@@ -1,5 +1,6 @@
 package com.medtracker.models
 
+import com.medtracker.repositories.enumTypes.WeightOrVolume
 import com.medtracker.utilities.ifLet
 
 class Drug(
@@ -8,10 +9,11 @@ class Drug(
     var thumbnailURL: String? = null,
     var purity: Double? = null,
     var quantity: Int? = null,
-    var measurementUnit: String? = null,
+    var measurementUnit: WeightOrVolume? = null,
     var brand: Brand? = null,
     var source: Source? = null,
     var components: ArrayList<Drug> = ArrayList(),
+    var containers: ArrayList<Container> = ArrayList(),
     var componentOf: Drug? = null,
     var creator: User? = null
 ) {
@@ -23,8 +25,8 @@ class Drug(
 
     // Return the quantity of the drug with the used measurementUnit
     fun getQuantityWithUnit(): String? {
-        ifLet(quantity, measurementUnit) {(q, ms) ->
-            return q.toString() + ms.toString()
+        ifLet(quantity, measurementUnit) {(quantity, measurementUnit) ->
+            return quantity.toString() + measurementUnit.toString()
         }
         return null
     }

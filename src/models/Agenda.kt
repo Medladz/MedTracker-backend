@@ -1,6 +1,6 @@
 package com.medtracker.models
 
-import com.medtracker.repositories.dao.WeightOrVolume
+import com.medtracker.repositories.enumTypes.MeasurementUnit
 import org.joda.time.DateTime
 
 class Agenda(
@@ -11,6 +11,6 @@ class Agenda(
     var title: String? = null,
     var note: String? = null,
     var quantity: Int? = null,
-    var measurementUnit: WeightOrVolume? = null,
+    var measurementUnit: MeasurementUnit? = null,
     var consumedAt: DateTime? = null
 )

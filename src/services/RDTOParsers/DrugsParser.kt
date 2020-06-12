@@ -2,6 +2,7 @@ package com.medtracker.services.FDTOParsers
 
 import com.medtracker.models.Drug
 import com.medtracker.services.RDTOParsers.BrandsParser
+import com.medtracker.services.RDTOParsers.ContainersParser
 import com.medtracker.services.RDTOParsers.DrugComponentsParser
 import com.medtracker.services.RDTOParsers.SourcesParser
 import com.medtracker.services.dto.*
@@ -29,6 +30,12 @@ class DrugsParser(val includedResources: List<String>?) {
                         id = it.id.toString()
                     )
                 },
+                containers = drug.containers.map {
+                    RelationRDTO(
+                        type = "containers",
+                        id = it.id.toString()
+                    )
+                },
                 components = drug.components.map {
                     RelationRDTO(
                         type = "drugs",
@@ -45,8 +52,12 @@ class DrugsParser(val includedResources: List<String>?) {
                 if (it.contains("sources"))
                     included["sources"] = drug.source?.let { SourcesParser().parseSingle(drug.source!!) }
 
-                if (it.contains("drugComponents"))
-                    included["drugComponents"] = DrugComponentsParser().parseMultiple(drug.components)
+                // @todo dit uitbreiden
+                if (it.contains("components"))
+                    included["components"] = DrugComponentsParser().parseMultiple(drug.components)
+
+                if (it.contains("containers"))
+                    included["containers"] = ContainersParser().parseMultiple(drug.containers)
 
                 included
             }

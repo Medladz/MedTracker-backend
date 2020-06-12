@@ -3,8 +3,9 @@ package com.medtracker.repositories.dao
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.Table
 
-object DrugContainerDAO : Table("\"drugContainer\""){
+object FavoritedDrugDAO : Table("\"favoritedDrug\""){
     val drugId: Column<Int> = integer("drugID").references(DrugDAO.id)
-    val containerId: Column<Int> = integer("containerID").references(ContainerDAO.id)
+    val userId: Column<Int> = integer("userID").references(UserDAO.id)
+    val order: Column<Short> = short("order")
     // @todo PrimaryKey
 }
