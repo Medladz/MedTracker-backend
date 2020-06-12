@@ -59,12 +59,10 @@ fun Application.module(testing: Boolean = false) {
             try {
                 val drugController = DrugController()
 
-                val creatorId = call.parameters["creatorId"]?.toInt()
+                val creatorId = call.parameters["creatorId"]?.toInt() ?: throw IllegalArgumentException()
                 val withVerified = call.request.queryParameters["withVerified"]?.toBoolean() ?: true
                 val includedResources = call.request.queryParameters["include"]?.split(",")
-                if (creatorId === null) {
-                    throw IllegalArgumentException()
-                }
+
                 val drugData = drugController.getAllByCreator(creatorId, withVerified, includedResources)
 
                 call.respond(drugData)

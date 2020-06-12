@@ -52,7 +52,6 @@ class DrugsParser(val includedResources: List<String>?) {
                 if (it.contains("sources"))
                     included["sources"] = drug.source?.let { SourcesParser().parseSingle(drug.source!!) }
 
-                // @todo dit uitbreiden
                 if (it.contains("components"))
                     included["components"] = DrugComponentsParser().parseMultiple(drug.components)
 
