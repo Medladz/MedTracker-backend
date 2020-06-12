@@ -76,9 +76,30 @@ create table "favoritedDrug"(
     FOREIGN KEY ("userID") REFERENCES "user" ("ID") ON DELETE CASCADE ON UPDATE NO ACTION
 );
 create table "drugContainer"(
-    "drugID" SERIAL NOT NULL,
+    "drugID" INT NOT NULL,
     "containerID" INT NOT NULL,
     PRIMARY KEY("drugID", "containerID"),
     FOREIGN KEY("drugID") REFERENCES "drug" ("ID") ON DELETE CASCADE ON UPDATE NO ACTION,
     FOREIGN KEY("containerID") REFERENCES "container" ("ID") ON DELETE CASCADE ON UPDATE NO ACTION
 );
+
+-- DUMMY DATA INSERT
+INSERT INTO "user" ("ID", username, email, password, verified, birthday) VALUES (1, 'jonty', 'jonty@gmail.com', 'jonty123', true, '2020-06-06');
+INSERT INTO "user" ("ID", username, email, password, verified, birthday) VALUES (2, 'henk', 'henk@gmail.com', 'henk123', false, '2020-06-06');
+INSERT INTO "user" ("ID", username, email, password, verified, birthday) VALUES (3, 'finn', 'finn@gmail.com', 'finn123', false, '2020-06-06');
+
+INSERT INTO "brand" ("ID", "creatorID", name) VALUES (1, 1, 'a brand');
+
+INSERT INTO "source" ("ID", "creatorID", name) VALUES (1, 1, 'a source');
+
+INSERT INTO "container" ("ID", "creatorID", name, quantity, "measurementUnit", "thumbnailURL") VALUES (1, 1, 'a container', 250, 'ml', 'https://www.kruizinga.nl/productsV2/1536/16000/16FT-02AC-aa.jpg');
+
+INSERT INTO "drug" ("ID", "creatorID", "brandID", "sourceID", name, "thumbnailURL") VALUES (1, 1, 1, 1, 'drug by jonty', null);
+INSERT INTO "drug" ("ID", "creatorID", "brandID", "sourceID", name, "thumbnailURL") VALUES (2, 2, 1, 1, 'drug by henk', 'https://upload.wikimedia.org/wikipedia/commons/1/1c/Water_molecule_3D.svg');
+INSERT INTO "drug" ("ID", "creatorID", "brandID", "sourceID", name, "thumbnailURL") VALUES (3, 3, null, null, 'drug by finn', 'https://upload.wikimedia.org/wikipedia/commons/1/1c/Water_molecule_3D.svg');
+
+INSERT INTO "drugComponent" ("drugID", "componentID", purity, quantity, "measurementUnit") VALUES (2, 1, 50.00, 100, 'ml');
+INSERT INTO "drugComponent" ("drugID", "componentID", purity, quantity, "measurementUnit") VALUES (3, 1, 20.00, 50, 'ml');
+INSERT INTO "drugComponent" ("drugID", "componentID", purity, quantity, "measurementUnit") VALUES (3, 2, 90.00, null, 'mg');
+
+INSERT INTO "drugContainer" ("drugID", "containerID") VALUES (3, 1);
