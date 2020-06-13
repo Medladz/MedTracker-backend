@@ -19,7 +19,7 @@ class AgendaRepository {
                 it[creatorID] = toInt((agenda.creator?.id).toString())
                 it[drugID]= toInt((agenda.drug?.id).toString())
                 it[containerID] = agenda.container?.id
-                it[title] = agenda.title
+                it[title] = agenda.title ?: ""
                 it[note] = agenda.note
                 it[quantity] = agenda.quantity
                 it[measurementUnit] = agenda.measurementUnit
@@ -83,7 +83,7 @@ class AgendaRepository {
                 it[creatorID] = toInt(agendaEntry.creator?.id.toString())
                 it[drugID] = toInt(agendaEntry.drug?.id.toString())
                 it[containerID] = agendaEntry.container?.id
-                it[title] = agendaEntry.title
+                it[title] = agendaEntry.title ?: ""
                 it[note] = agendaEntry.note
                 it[quantity] = agendaEntry.quantity
                 it[measurementUnit] = agendaEntry.measurementUnit

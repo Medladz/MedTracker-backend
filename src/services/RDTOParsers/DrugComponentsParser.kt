@@ -5,29 +5,22 @@ import com.medtracker.services.dto.*
 
 class DrugComponentsParser {
 
-    fun parseSingle(drugComponent: Drug): ResourceRDTO<DrugComponentRDTO, DrugComponentRelationshipsRDTO> {
+    fun parseSingle(drugComponent: Drug): ResourceRDTO<DrugComponentRDTO, Unit> {
         return ResourceRDTO(
             type = "drugs",
             id = drugComponent.id.toString(),
             attributes = DrugComponentRDTO(
+                name = drugComponent.name,
+                thumbnailURL = drugComponent.thumbnailURL,
                 quantity = drugComponent.getQuantityWithUnit(),
                 purity = drugComponent.getPurityPercentage()
             ),
-            relationships = DrugComponentRelationshipsRDTO(
-                drug = RelationRDTO(
-                    type = "drugs",
-                    id = drugComponent.id.toString()
-                ),
-                componentOf = RelationRDTO(
-                    type = "drugs",
-                    id = drugComponent.componentOf?.id.toString()
-                )
-            ),
+            relationships = null,
             included = null
         )
     }
 
-    fun parseMultiple(drugComponents: ArrayList<Drug>): List<ResourceRDTO<DrugComponentRDTO, DrugComponentRelationshipsRDTO>> {
+    fun parseMultiple(drugComponents: ArrayList<Drug>): List<ResourceRDTO<DrugComponentRDTO, Unit>> {
         return drugComponents.map { parseSingle(it) }
     }
 }

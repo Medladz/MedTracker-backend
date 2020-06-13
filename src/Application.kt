@@ -16,8 +16,6 @@ import com.medtracker.controllers.UserController
 import com.medtracker.models.Agenda
 import com.medtracker.models.User
 import com.medtracker.models.UserDTO
-import com.medtracker.repositories.DrugComponentDAO
-import com.medtracker.repositories.dao.DrugDAO
 import com.medtracker.repositories.dao.UserDAO
 import java.lang.Exception
 import java.lang.IllegalArgumentException
@@ -61,12 +59,10 @@ fun Application.module(testing: Boolean = false) {
             try {
                 val drugController = DrugController()
 
-                val creatorId = call.parameters["creatorId"]?.toInt()
+                val creatorId = call.parameters["creatorId"]?.toInt() ?: throw IllegalArgumentException()
                 val withVerified = call.request.queryParameters["withVerified"]?.toBoolean() ?: true
                 val includedResources = call.request.queryParameters["include"]?.split(",")
-                if (creatorId === null) {
-                    throw IllegalArgumentException()
-                }
+
                 val drugData = drugController.getAllByCreator(creatorId, withVerified, includedResources)
 
                 call.respond(drugData)

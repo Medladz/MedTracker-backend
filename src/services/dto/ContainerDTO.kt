@@ -1,8 +1,7 @@
 package com.medtracker.services.dto
 
-data class DrugComponentRDTO(
+data class ContainerRDTO(
     val name: String?,
-    val thumbnailURL: String?,
     val quantity: String?,
-    val purity: String?
+    val thumbnailURL: String?
 )
