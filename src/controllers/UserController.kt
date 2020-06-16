@@ -1,34 +1,20 @@
 package com.medtracker.controllers
 
-import com.medtracker.models.User
-import com.medtracker.models.UserDTO
-import com.medtracker.repositories.dao.UserDAO
-import com.medtracker.services.DrugService
 import com.medtracker.services.UserService
-import org.jetbrains.exposed.sql.deleteWhere
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.selectAll
-import org.jetbrains.exposed.sql.transactions.transaction
-import org.jetbrains.exposed.sql.update
-import org.joda.time.DateTime
-import org.joda.time.format.DateTimeFormat
-import org.joda.time.format.DateTimeFormatter
-
+import com.medtracker.services.dto.UserFDTO
+import com.medtracker.services.validators.UserValidator
+import java.lang.Exception
 
 class UserController {
 
-    fun insert(user: UserDTO) {
+    // Parse the body parameters to the model and use the model to create a new user record.
+    fun createNew(userFDTO: UserFDTO) {
+        val userService = UserService()
+        val user = userService.parseUserFDTO(userFDTO)
 
-        transaction {
-            UserDAO.insert {
-                it[username] = user.username
-                it[email] = user.email
-                it[password] = user.password
-                it[verified] = user.verified
-                it[birthday] = DateTime.parse(user.birthday)
-            }
-        }
+        userService.createNew(user)
     }
+
     fun login(includedResources: List<String>?){
         val userService = UserService()
         val jwtToken= userService.login(includedResources)

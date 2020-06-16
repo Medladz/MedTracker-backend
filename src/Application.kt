@@ -5,6 +5,8 @@ import io.ktor.response.*
 import io.ktor.request.*
 import io.ktor.routing.*
 import com.fasterxml.jackson.databind.*
+import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException
+import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import io.ktor.jackson.*
 import io.ktor.features.*
 import com.zaxxer.hikari.HikariConfig
@@ -15,16 +17,14 @@ import com.medtracker.controllers.DrugController
 import com.medtracker.controllers.UserController
 import com.medtracker.models.Agenda
 import com.medtracker.models.User
-import com.medtracker.models.UserDTO
 import com.medtracker.repositories.dao.UserDAO
+import com.medtracker.services.UserEmailExists
 import java.lang.Exception
 import java.lang.IllegalArgumentException
 import java.lang.NumberFormatException
 import com.medtracker.services.dto.AgendaFDTO
-import io.ktor.auth.*
+import com.medtracker.services.dto.UserFDTO
 import io.ktor.http.HttpStatusCode
-import io.ktor.util.getDigestFunction
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -79,11 +79,11 @@ fun Application.module(testing: Boolean = false) {
             val agendaController = AgendaController()
             val agendaId: Int = call.parameters["id"].toString().toInt()
             val agenda = call.receive<Agenda>()
-            agendaController.updateAgendaEntry(agendaId,agenda)
+            agendaController.updateAgendaEntry(agendaId, agenda)
             call.respond(agenda)
         }
 
-        post("/agendaentry"){
+        post("/agendaentry") {
             val agendaController = AgendaController()
             val AgendaFDTO = call.receive<AgendaFDTO>()
 
@@ -94,7 +94,7 @@ fun Application.module(testing: Boolean = false) {
             val agendaController = AgendaController()
             val creatorId = call.parameters["creatorId"].toString().toInt()
             val includedResources: List<String>? = call.request.queryParameters["include"]?.split(",")
-            val AgendaEntries = agendaController.getAgendaEntriesByCreator(creatorId,includedResources)
+            val AgendaEntries = agendaController.getAgendaEntriesByCreator(creatorId, includedResources)
 
             call.respond(AgendaEntries)
         }
@@ -106,23 +106,43 @@ fun Application.module(testing: Boolean = false) {
             call.respond(HttpStatusCode.OK)
         }
 
-        post("/login"){
+        post("/login") {
             val userData = call.receive<User>()
-            var userID :Int = 0
-            transaction{
-                UserDAO.select{( UserDAO.email eq userData.email.toString()) and (UserDAO.password eq userData.password.toString()) }.map{
-                    userID = it[UserDAO.id]
-                }
+            var userID: Int = 0
+            transaction {
+                UserDAO.select { (UserDAO.email eq userData.email.toString()) and (UserDAO.password eq userData.password.toString()) }
+                    .map {
+                        userID = it[UserDAO.id]
+                    }
             }
             call.respond(userID)
         }
 
+        post("/users") {
+            try {
+                val userController = UserController()
+                val userFDTO = call.receive<UserFDTO>()
 
-        post("/user") {
-            val userController = UserController()
-            val userDTO = call.receive<UserDTO>()
-            userController.insert(userDTO)
-            call.respond(userDTO)
+                userController.createNew(userFDTO)
+
+                call.respond(HttpStatusCode.Created, "User has been created.")
+            } catch (e: Exception) {
+                var statusCode = HttpStatusCode.InternalServerError
+                var message = "Something went wrong with the server."
+
+                when (e) {
+                    is UnrecognizedPropertyException, is MissingKotlinParameterException -> {
+                        statusCode = HttpStatusCode.UnprocessableEntity
+                        message = "Body parameters doesn't suffice the specifications."
+                    }
+                    is UserEmailExists, is IllegalArgumentException -> {
+                        statusCode = HttpStatusCode.UnprocessableEntity
+                        e.message?.let { message = it }
+                    }
+                }
+
+                call.respond(statusCode, message)
+            }
         }
 //        val userController = UserController()
 //        val drugController = DrugController()
@@ -189,9 +209,6 @@ fun Application.module(testing: Boolean = false) {
 
 
 //        }
-
-
-
 
 
 //        put("/user/{id}") {
