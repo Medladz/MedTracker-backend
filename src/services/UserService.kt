@@ -5,10 +5,8 @@ import com.medtracker.repositories.UserRepository
 import com.medtracker.services.dto.LoginFDTO
 import com.medtracker.services.dto.UserFDTO
 import com.medtracker.services.validators.UserValidator
-import com.medtracker.utilities.AuthenticationException
-import io.ktor.auth.UnauthorizedResponse
-import java.lang.Exception
-import java.lang.IllegalArgumentException
+import com.medtracker.utilities.UnauthorizedException
+import com.medtracker.utilities.UnprocessableEntityException
 
 class UserService {
 
@@ -24,7 +22,7 @@ class UserService {
 
         userValidator.validate(user)
 
-        if (userRepository.emailExists(user.email!!)) throw IllegalArgumentException("Email is already in use.")
+        if (userRepository.emailExists(user.email!!)) throw UnprocessableEntityException("Email is already in use.")
 
         user.hashThePassword()
 
@@ -43,9 +41,9 @@ class UserService {
 
         userValidator.validate(user)
 
-        val foundUser = userRepository.findByEmail(user.email!!) ?: throw AuthenticationException()
+        val foundUser = userRepository.findByEmail(user.email!!) ?: throw UnauthorizedException()
 
-        if(!foundUser.verifyPassword(user.password!!)) throw AuthenticationException()
+        if(!foundUser.verifyPassword(user.password!!)) throw UnauthorizedException()
 
         user.id = foundUser.id
         user.password = foundUser.password
