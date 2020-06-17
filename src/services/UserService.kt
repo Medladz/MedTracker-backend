@@ -35,6 +35,7 @@ class UserService {
      * Validate the data of the [User] if it has the correct format.
      * Find the user by its [User.email] in the [UserRepository].
      * Verify the [User] plain text password with the hashed password of the stored user.
+     * Set the data of the stored user into the [User].
      */
     fun login(user: User) {
         val userValidator = UserValidator()
@@ -45,6 +46,9 @@ class UserService {
         val foundUser = userRepository.findByEmail(user.email!!) ?: throw AuthenticationException()
 
         if(!foundUser.verifyPassword(user.password!!)) throw AuthenticationException()
+
+        user.id = foundUser.id
+        user.password = foundUser.password
     }
 
     fun parseLoginFDTO(loginFDTO: LoginFDTO): User {

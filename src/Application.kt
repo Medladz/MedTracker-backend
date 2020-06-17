@@ -20,13 +20,14 @@ import com.medtracker.models.User
 import com.medtracker.services.JWTAuth
 import java.lang.Exception
 import java.lang.IllegalArgumentException
-import java.lang.NumberFormatException
 import com.medtracker.services.dto.AgendaFDTO
 import com.medtracker.services.dto.LoginFDTO
 import com.medtracker.services.dto.UserFDTO
 import com.medtracker.utilities.AuthenticationException
+import com.medtracker.utilities.BadRequestException
 import io.ktor.auth.Authentication
 import io.ktor.auth.authenticate
+import io.ktor.auth.authentication
 import io.ktor.auth.jwt.jwt
 import io.ktor.http.HttpStatusCode
 import kotlin.text.*
@@ -62,6 +63,10 @@ fun Application.module(testing: Boolean = false) {
             call.respond(HttpStatusCode.UnprocessableEntity, exception.message ?: "Request is invalid.")
         }
 
+        exception<BadRequestException> { exception ->
+            call.respond(HttpStatusCode.BadRequest, exception.message ?: "Request is invalid.")
+        }
+
         exception<Exception> {
             call.respond(HttpStatusCode.InternalServerError, "Something went wrong with the server.")
         }
@@ -89,24 +94,17 @@ fun Application.module(testing: Boolean = false) {
 
     routing {
         authenticate {
-            get("/creators/{creatorId}/drugs") {
-                try {
-                    val drugController = DrugController()
+            get("/drugs") {
+                val drugController = DrugController()
 
-                    val creatorId = call.parameters["creatorId"]?.toInt() ?: throw IllegalArgumentException()
-                    val withVerified = call.request.queryParameters["withVerified"]?.toBoolean() ?: true
-                    val includedResources = call.request.queryParameters["include"]?.split(",")
+                val user = call.authentication.principal<User>()!!
+                val creatorId = user.id!!
+                val withVerified = call.parameters["withVerified"]?.toBoolean() ?: true
+                val includedResources = call.parameters["include"]?.split(",")
 
-                    val drugData = drugController.getAllByCreator(creatorId, withVerified, includedResources)
+                val drugData = drugController.getAllByCreator(creatorId, withVerified, includedResources)
 
-                    call.respond(drugData)
-                } catch (e: Exception) {
-                    val statusCode = when (e) {
-                        is IllegalArgumentException, is NumberFormatException -> HttpStatusCode.BadRequest
-                        else -> throw e;
-                    }
-                    call.respond(statusCode)
-                }
+                call.respond(drugData)
             }
         }
 
@@ -143,30 +141,12 @@ fun Application.module(testing: Boolean = false) {
 
         route("/users") {
             post {
-                try {
-                    val userController = UserController()
+                val userController = UserController()
 
-                    val userFDTO = call.receive<UserFDTO>()
-                    val authData = userController.createNew(userFDTO)
+                val userFDTO = call.receive<UserFDTO>()
+                val authData = userController.createNew(userFDTO)
 
-                    call.respond(HttpStatusCode.Created, authData)
-                } catch (e: Exception) {
-                    var statusCode = HttpStatusCode.InternalServerError
-                    var message = "Something went wrong with the server."
-
-                    when (e) {
-                        is UnrecognizedPropertyException, is MissingKotlinParameterException -> {
-                            statusCode = HttpStatusCode.UnprocessableEntity
-                            message = "Body parameters doesn't suffice the specifications."
-                        }
-                        is IllegalArgumentException -> {
-                            statusCode = HttpStatusCode.UnprocessableEntity
-                            e.message?.let { message = it }
-                        }
-                    }
-
-                    call.respond(statusCode, message)
-                }
+                call.respond(HttpStatusCode.Created, authData)
             }
 
             post("/login") {

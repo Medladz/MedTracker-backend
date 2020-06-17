@@ -1,5 +1,6 @@
 package com.medtracker.controllers
 
+import com.medtracker.models.Drug
 import com.medtracker.services.DrugService
 import com.medtracker.services.dto.DrugRDTO
 import com.medtracker.services.dto.DrugRelationshipsRDTO
@@ -8,11 +9,15 @@ import com.medtracker.services.responseParsers.DrugsParser
 
 class DrugController {
 
+    /**
+     * Request the [DrugService] to get a list of [Drug].
+     * Parse this list into a [ResourcesResponseRDTO] and send it pack.
+     */
     fun getAllByCreator(creatorId: Int, withVerified: Boolean, includedResources: List<String>? ): ResourcesResponseRDTO<DrugRDTO, DrugRelationshipsRDTO> {
         val drugService = DrugService()
         val drugsParser = DrugsParser(includedResources)
 
-        val drugs= drugService.getAllByCreator(creatorId, withVerified, includedResources)
+        val drugs: ArrayList<Drug> = drugService.getAllByCreator(creatorId, withVerified, includedResources)
 
        return drugsParser.parse(drugs)
     }
