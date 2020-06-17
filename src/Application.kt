@@ -20,13 +20,16 @@ import com.medtracker.models.User
 import com.medtracker.services.JWTAuth
 import java.lang.Exception
 import java.lang.IllegalArgumentException
-import java.lang.NumberFormatException
 import com.medtracker.services.dto.AgendaFDTO
 import com.medtracker.services.dto.LoginFDTO
 import com.medtracker.services.dto.UserFDTO
-import com.medtracker.utilities.AuthenticationException
+import com.medtracker.utilities.UnauthorizedException
+import com.medtracker.utilities.BadRequestException
+import com.medtracker.utilities.InternalServerErrorException
+import com.medtracker.utilities.UnprocessableEntityException
 import io.ktor.auth.Authentication
 import io.ktor.auth.authenticate
+import io.ktor.auth.authentication
 import io.ktor.auth.jwt.jwt
 import io.ktor.http.HttpStatusCode
 import kotlin.text.*
@@ -46,10 +49,6 @@ fun Application.module(testing: Boolean = false) {
     }
 
     install(StatusPages) {
-        exception<AuthenticationException> {
-            call.respond(HttpStatusCode.Unauthorized, "Invalid credentials.")
-        }
-
         exception<UnrecognizedPropertyException> {
             call.respond(HttpStatusCode.UnprocessableEntity, "Body parameters doesn't suffice the specifications.")
         }
@@ -58,8 +57,16 @@ fun Application.module(testing: Boolean = false) {
             call.respond(HttpStatusCode.UnprocessableEntity, "Body parameters doesn't suffice the specifications.")
         }
 
-        exception<IllegalArgumentException> { exception ->
+        exception<UnauthorizedException> {
+            call.respond(HttpStatusCode.Unauthorized, "Invalid credentials.")
+        }
+
+        exception<UnprocessableEntityException> { exception ->
             call.respond(HttpStatusCode.UnprocessableEntity, exception.message ?: "Request is invalid.")
+        }
+
+        exception<BadRequestException> { exception ->
+            call.respond(HttpStatusCode.BadRequest, exception.message ?: "Request is invalid.")
         }
 
         exception<Exception> {
@@ -88,85 +95,14 @@ fun Application.module(testing: Boolean = false) {
     initDB()
 
     routing {
-        authenticate {
-            get("/creators/{creatorId}/drugs") {
-                try {
-                    val drugController = DrugController()
-
-                    val creatorId = call.parameters["creatorId"]?.toInt() ?: throw IllegalArgumentException()
-                    val withVerified = call.request.queryParameters["withVerified"]?.toBoolean() ?: true
-                    val includedResources = call.request.queryParameters["include"]?.split(",")
-
-                    val drugData = drugController.getAllByCreator(creatorId, withVerified, includedResources)
-
-                    call.respond(drugData)
-                } catch (e: Exception) {
-                    val statusCode = when (e) {
-                        is IllegalArgumentException, is NumberFormatException -> HttpStatusCode.BadRequest
-                        else -> throw e;
-                    }
-                    call.respond(statusCode)
-                }
-            }
-        }
-
-        put("/agendaentry/{id}") {
-            val agendaController = AgendaController()
-            val agendaId: Int = call.parameters["id"].toString().toInt()
-            val agenda = call.receive<Agenda>()
-            agendaController.updateAgendaEntry(agendaId, agenda)
-            call.respond(agenda)
-        }
-
-        post("/agendaentry") {
-            val agendaController = AgendaController()
-            val AgendaFDTO = call.receive<AgendaFDTO>()
-
-            agendaController.createAgendaEntry(AgendaFDTO)
-            call.respond(AgendaFDTO)
-        }
-        get("/agendaentries/{creatorId}") {
-            val agendaController = AgendaController()
-            val creatorId = call.parameters["creatorId"].toString().toInt()
-            val includedResources: List<String>? = call.request.queryParameters["include"]?.split(",")
-            val AgendaEntries = agendaController.getAgendaEntriesByCreator(creatorId, includedResources)
-
-            call.respond(AgendaEntries)
-        }
-
-        delete("/agendaentry/{id}") {
-            val agendaController = AgendaController()
-            val agendaId: Int = call.parameters["id"].toString().toInt()
-            agendaController.deleteAgendaEntry(agendaId)
-            call.respond(HttpStatusCode.OK)
-        }
-
         route("/users") {
             post {
-                try {
-                    val userController = UserController()
+                val userController = UserController()
 
-                    val userFDTO = call.receive<UserFDTO>()
-                    val authData = userController.createNew(userFDTO)
+                val userFDTO = call.receive<UserFDTO>()
+                val authData = userController.createNew(userFDTO)
 
-                    call.respond(HttpStatusCode.Created, authData)
-                } catch (e: Exception) {
-                    var statusCode = HttpStatusCode.InternalServerError
-                    var message = "Something went wrong with the server."
-
-                    when (e) {
-                        is UnrecognizedPropertyException, is MissingKotlinParameterException -> {
-                            statusCode = HttpStatusCode.UnprocessableEntity
-                            message = "Body parameters doesn't suffice the specifications."
-                        }
-                        is IllegalArgumentException -> {
-                            statusCode = HttpStatusCode.UnprocessableEntity
-                            e.message?.let { message = it }
-                        }
-                    }
-
-                    call.respond(statusCode, message)
-                }
+                call.respond(HttpStatusCode.Created, authData)
             }
 
             post("/login") {
@@ -176,6 +112,64 @@ fun Application.module(testing: Boolean = false) {
                 val authData = userController.login(loginFDTO)
 
                 call.respond(authData)
+            }
+        }
+
+        authenticate {
+            get("/drugs") {
+                val drugController = DrugController()
+
+                val user = call.authentication.principal<User>()!!
+                val creatorId = user.id!!
+                val withVerified = call.parameters["withVerified"]?.toBoolean() ?: true
+                val includedResources = call.parameters["include"]?.split(",")
+
+                val drugData = drugController.getAllByCreator(creatorId, withVerified, includedResources)
+
+                call.respond(drugData)
+            }
+
+            route("/agendaEntries") {
+                post {
+                    val agendaController = AgendaController()
+                    val agendaFDTO = call.receive<AgendaFDTO>()
+
+                    agendaController.createAgendaEntry(agendaFDTO)
+
+                    call.respond(HttpStatusCode.Created, mapOf("data" to "Agenda has been created."))
+                }
+
+                get {
+                    val agendaController = AgendaController()
+
+                    val user = call.authentication.principal<User>()!!
+                    val creatorId = user.id!!
+                    val includedResources = call.parameters["include"]?.split(",")
+                    val agendaEntries = agendaController.getAgendaEntriesByCreator(creatorId, includedResources)
+
+                    call.respond(agendaEntries)
+                }
+
+                delete("/{id}") {
+                    val agendaController = AgendaController()
+
+                    val agendaId: Int = call.parameters["id"]?.toInt() ?: throw InternalServerErrorException()
+
+                    agendaController.deleteAgendaEntry(agendaId)
+
+                    call.respond(mapOf("data" to "Agenda has been deleted."))
+                }
+
+                put("/{id}"){
+                    val agendaController = AgendaController()
+
+                    val agendaId: Int = call.parameters["id"]?.toInt() ?: throw InternalServerErrorException()
+                    val agenda = call.receive<Agenda>()
+
+                    agendaController.updateAgendaEntry(agendaId, agenda)
+
+                    call.respond(mapOf("data" to "Agenda has been modified."))
+                }
             }
         }
 //        val userController = UserController()

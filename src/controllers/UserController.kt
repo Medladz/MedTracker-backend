@@ -7,6 +7,8 @@ import com.medtracker.services.dto.AuthDTO
 import com.medtracker.services.dto.LoginFDTO
 import com.medtracker.services.dto.UserFDTO
 import com.medtracker.services.responseParsers.AuthParser
+import com.medtracker.utilities.UnprocessableEntityException
+import java.lang.IllegalArgumentException
 
 class UserController {
 
@@ -16,14 +18,20 @@ class UserController {
      * Use the [AuthParser] to send back the [AuthDTO] with the generated JWT.
      */
     fun createNew(userFDTO: UserFDTO): AuthDTO {
-        val userService = UserService()
-        val authParser = AuthParser()
+        try {
+            val userService = UserService()
+            val authParser = AuthParser()
+            val user = userService.parseUserFDTO(userFDTO)
 
-        val user = userService.parseUserFDTO(userFDTO)
+            userService.createNew(user)
 
-        userService.createNew(user)
-
-        return authParser.parse(JWTAuth.generate(user))
+            return authParser.parse(JWTAuth.generate(user))
+        } catch (e: Exception) {
+            when(e){
+                is IllegalArgumentException -> throw UnprocessableEntityException(e.message)
+                else -> throw e
+            }
+        }
     }
 
     /**

@@ -1,5 +1,6 @@
 package com.medtracker.utilities
 
-import java.lang.RuntimeException
-
-class AuthenticationException(message: String? = null): RuntimeException(message)
+class UnauthorizedException(message: String? = null): Exception(message)
+class BadRequestException(message: String? = null): Exception(message)
+class UnprocessableEntityException(message: String? = null): Exception(message)
+class InternalServerErrorException(message: String? = null): Exception(message)
