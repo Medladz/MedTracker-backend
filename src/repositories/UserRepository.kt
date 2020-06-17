@@ -12,14 +12,26 @@ import kotlin.system.exitProcess
 
 
 class UserRepository {
-    fun login(includedResources: List<String>?) {
-
-    }
 
     // Check if the given email exists in the database
     fun emailExists(email: String): Boolean {
         return transaction {
             return@transaction UserDAO.select { UserDAO.email eq email }.count() > 0
+        }
+    }
+
+    /**
+     * Uses the [email] to fetch it's user record from the database.
+     * Convert the user record to [User]
+     */
+    fun findByEmail(email: String): User? {
+        return transaction {
+            val userRecord = UserDAO.select{ UserDAO.email eq email}.firstOrNull() ?: return@transaction null
+
+            User(
+                id = userRecord[UserDAO.id],
+                password = userRecord[UserDAO.password]
+            )
         }
     }
 

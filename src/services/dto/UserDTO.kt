@@ -6,3 +6,8 @@ data class UserFDTO(
     val password: String,
     val birthday: String
 )
+
+data class LoginFDTO(
+    val email: String,
+    val password: String
+)

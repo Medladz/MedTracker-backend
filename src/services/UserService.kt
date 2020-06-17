@@ -2,12 +2,13 @@ package com.medtracker.services
 
 import com.medtracker.models.User
 import com.medtracker.repositories.UserRepository
+import com.medtracker.services.dto.LoginFDTO
 import com.medtracker.services.dto.UserFDTO
 import com.medtracker.services.validators.UserValidator
-import org.joda.time.DateTime
+import com.medtracker.utilities.AuthenticationException
+import io.ktor.auth.UnauthorizedResponse
 import java.lang.Exception
-import java.lang.NullPointerException
-
+import java.lang.IllegalArgumentException
 
 class UserService {
 
@@ -23,11 +24,34 @@ class UserService {
 
         userValidator.validate(user)
 
-        if(userRepository.emailExists(user.email!!)) throw UserEmailExists("Email is already in use.")
+        if (userRepository.emailExists(user.email!!)) throw IllegalArgumentException("Email is already in use.")
 
         user.hashThePassword()
 
         userRepository.createNew(user)
+    }
+
+    /**
+     * Validate the data of the [User] if it has the correct format.
+     * Find the user by its [User.email] in the [UserRepository].
+     * Verify the [User] plain text password with the hashed password of the stored user.
+     */
+    fun login(user: User) {
+        val userValidator = UserValidator()
+        val userRepository = UserRepository()
+
+        userValidator.validate(user)
+
+        val foundUser = userRepository.findByEmail(user.email!!) ?: throw AuthenticationException()
+
+        if(!foundUser.verifyPassword(user.password!!)) throw AuthenticationException()
+    }
+
+    fun parseLoginFDTO(loginFDTO: LoginFDTO): User {
+        return User(
+            email = loginFDTO.email,
+            password = loginFDTO.password
+        )
     }
 
     fun parseUserFDTO(userFDTO: UserFDTO): User {
@@ -38,11 +62,4 @@ class UserService {
             birthday = userFDTO.birthday
         )
     }
-
-    fun login(includedResources: List<String>?) {
-        val userRepository = UserRepository()
-        return userRepository.login(includedResources)
-    }
 }
-
-class UserEmailExists(override val message: String?): Exception()

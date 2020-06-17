@@ -17,25 +17,18 @@ import com.medtracker.controllers.DrugController
 import com.medtracker.controllers.UserController
 import com.medtracker.models.Agenda
 import com.medtracker.models.User
-import com.medtracker.repositories.dao.UserDAO
 import com.medtracker.services.JWTAuth
-import com.medtracker.services.UserEmailExists
 import java.lang.Exception
 import java.lang.IllegalArgumentException
 import java.lang.NumberFormatException
 import com.medtracker.services.dto.AgendaFDTO
-import com.medtracker.services.dto.AuthDTO
+import com.medtracker.services.dto.LoginFDTO
 import com.medtracker.services.dto.UserFDTO
+import com.medtracker.utilities.AuthenticationException
 import io.ktor.auth.Authentication
-import io.ktor.auth.Principal
 import io.ktor.auth.authenticate
-import io.ktor.auth.authentication
-import io.ktor.auth.jwt.JWTPrincipal
 import io.ktor.auth.jwt.jwt
 import io.ktor.http.HttpStatusCode
-import org.jetbrains.exposed.sql.and
-import org.jetbrains.exposed.sql.select
-import org.jetbrains.exposed.sql.transactions.transaction
 import kotlin.text.*
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
@@ -50,6 +43,28 @@ fun Application.module(testing: Boolean = false) {
         val ds = HikariDataSource(config)
 
         Database.connect(ds)
+    }
+
+    install(StatusPages) {
+        exception<AuthenticationException> {
+            call.respond(HttpStatusCode.Unauthorized, "Invalid credentials.")
+        }
+
+        exception<UnrecognizedPropertyException> {
+            call.respond(HttpStatusCode.UnprocessableEntity, "Body parameters doesn't suffice the specifications.")
+        }
+
+        exception<MissingKotlinParameterException> {
+            call.respond(HttpStatusCode.UnprocessableEntity, "Body parameters doesn't suffice the specifications.")
+        }
+
+        exception<IllegalArgumentException> { exception ->
+            call.respond(HttpStatusCode.UnprocessableEntity, exception.message ?: "Request is invalid.")
+        }
+
+        exception<Exception> {
+            call.respond(HttpStatusCode.InternalServerError, "Something went wrong with the server.")
+        }
     }
 
     install(ContentNegotiation) {
@@ -126,42 +141,41 @@ fun Application.module(testing: Boolean = false) {
             call.respond(HttpStatusCode.OK)
         }
 
-        post("/login") {
-            val userData = call.receive<User>()
-            var userID: Int = 0
-            transaction {
-                UserDAO.select { (UserDAO.email eq userData.email.toString()) and (UserDAO.password eq userData.password.toString()) }
-                    .map {
-                        userID = it[UserDAO.id]
-                    }
-            }
-            call.respond(userID)
-        }
+        route("/users") {
+            post {
+                try {
+                    val userController = UserController()
 
-        post("/users") {
-            try {
+                    val userFDTO = call.receive<UserFDTO>()
+                    val authData = userController.createNew(userFDTO)
+
+                    call.respond(HttpStatusCode.Created, authData)
+                } catch (e: Exception) {
+                    var statusCode = HttpStatusCode.InternalServerError
+                    var message = "Something went wrong with the server."
+
+                    when (e) {
+                        is UnrecognizedPropertyException, is MissingKotlinParameterException -> {
+                            statusCode = HttpStatusCode.UnprocessableEntity
+                            message = "Body parameters doesn't suffice the specifications."
+                        }
+                        is IllegalArgumentException -> {
+                            statusCode = HttpStatusCode.UnprocessableEntity
+                            e.message?.let { message = it }
+                        }
+                    }
+
+                    call.respond(statusCode, message)
+                }
+            }
+
+            post("/login") {
                 val userController = UserController()
 
-                val userFDTO = call.receive<UserFDTO>()
-                val authData = userController.createNew(userFDTO)
+                val loginFDTO = call.receive<LoginFDTO>()
+                val authData = userController.login(loginFDTO)
 
-                call.respond(HttpStatusCode.Created, authData)
-            } catch (e: Exception) {
-                var statusCode = HttpStatusCode.InternalServerError
-                var message = "Something went wrong with the server."
-
-                when (e) {
-                    is UnrecognizedPropertyException, is MissingKotlinParameterException -> {
-                        statusCode = HttpStatusCode.UnprocessableEntity
-                        message = "Body parameters doesn't suffice the specifications."
-                    }
-                    is UserEmailExists, is IllegalArgumentException -> {
-                        statusCode = HttpStatusCode.UnprocessableEntity
-                        e.message?.let { message = it }
-                    }
-                }
-
-                call.respond(statusCode, message)
+                call.respond(authData)
             }
         }
 //        val userController = UserController()
