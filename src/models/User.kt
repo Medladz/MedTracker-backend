@@ -16,7 +16,9 @@ class User(
 ) : Principal {
     var birthday: DateTime? = birthday?.parseBirthday()
 
-    // Parse birthday string to datetime
+    /**
+     * Parse the [birthday] to a [DateTime] instance
+     */
     private fun String.parseBirthday(): DateTime {
         try {
             return DateTime.parse(this)
@@ -25,9 +27,22 @@ class User(
         }
     }
 
-    // hash the password using the BCrypt algorithm and set it
+    /**
+     * Hash the [password] using the [BCrypt] algorithm and set it as [password].
+     */
     fun hashThePassword() {
         password = BCrypt.hashpw(password, BCrypt.gensalt()) ?: throw Exception("Password couldn't be hashed")
+    }
+
+    /**
+     * Verify [passwordToVerify] if it is the same as the hashed [password]
+     */
+    fun verifyPassword(passwordToVerify: String): Boolean {
+        try {
+            return BCrypt.checkpw(passwordToVerify, password)
+        } catch (e: Exception) {
+            throw Exception()
+        }
     }
 }
 

@@ -1,16 +1,20 @@
 package com.medtracker.controllers
 
+import com.medtracker.models.User
 import com.medtracker.services.JWTAuth
 import com.medtracker.services.UserService
 import com.medtracker.services.dto.AuthDTO
+import com.medtracker.services.dto.LoginFDTO
 import com.medtracker.services.dto.UserFDTO
 import com.medtracker.services.responseParsers.AuthParser
-import com.medtracker.services.validators.UserValidator
-import java.lang.Exception
 
 class UserController {
 
-    // Parse the body parameters to the model and use the model to create a new user record.
+    /**
+     * Parse the [userFDTO] to a [User].
+     * Use the [UserService] to create a new user record.
+     * Use the [AuthParser] to send back the [AuthDTO] with the generated JWT.
+     */
     fun createNew(userFDTO: UserFDTO): AuthDTO {
         val userService = UserService()
         val authParser = AuthParser()
@@ -22,10 +26,20 @@ class UserController {
         return authParser.parse(JWTAuth.generate(user))
     }
 
-    fun login(includedResources: List<String>?){
+    /**
+     * Parse the [loginFDTO] to a [User].
+     * Use this model to login the user with the [UserService].
+     * Use the [AuthParser] to send back the [AuthDTO] with the generated JWT.
+     */
+    fun login(loginFDTO: LoginFDTO): AuthDTO {
         val userService = UserService()
-        val jwtToken= userService.login(includedResources)
-        return jwtToken
+        val authParser = AuthParser();
+
+        val user: User = userService.parseLoginFDTO(loginFDTO)
+
+        userService.login(user)
+
+        return authParser.parse(JWTAuth.generate(user))
     }
 
 //    fun update(user: UserDTO, id: Int) {
