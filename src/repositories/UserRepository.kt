@@ -39,9 +39,9 @@ class UserRepository {
                 }
 
                 // @todo change when fix is released
-                val userID = UserDAO.select { UserDAO.email eq (user.email!!) }.firstOrNull()?.get(UserDAO.id)
+                val userId = UserDAO.select { UserDAO.email eq (user.email!!) }.firstOrNull()?.get(UserDAO.id)
 
-                user.id = userID
+                user.id = userId
             }
         } catch (e: Exception) {
             throw Exception("User could not be inserted.")

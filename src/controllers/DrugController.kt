@@ -1,10 +1,10 @@
 package com.medtracker.controllers
 
 import com.medtracker.services.DrugService
-import com.medtracker.services.FDTOParsers.DrugsParser
 import com.medtracker.services.dto.DrugRDTO
 import com.medtracker.services.dto.DrugRelationshipsRDTO
 import com.medtracker.services.dto.ResourcesResponseRDTO
+import com.medtracker.services.responseParsers.DrugsParser
 
 class DrugController {
 

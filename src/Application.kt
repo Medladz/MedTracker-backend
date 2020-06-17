@@ -18,17 +18,24 @@ import com.medtracker.controllers.UserController
 import com.medtracker.models.Agenda
 import com.medtracker.models.User
 import com.medtracker.repositories.dao.UserDAO
+import com.medtracker.services.JWTAuth
 import com.medtracker.services.UserEmailExists
 import java.lang.Exception
 import java.lang.IllegalArgumentException
 import java.lang.NumberFormatException
 import com.medtracker.services.dto.AgendaFDTO
+import com.medtracker.services.dto.AuthDTO
 import com.medtracker.services.dto.UserFDTO
+import io.ktor.auth.Authentication
+import io.ktor.auth.Principal
+import io.ktor.auth.authenticate
+import io.ktor.auth.authentication
+import io.ktor.auth.jwt.JWTPrincipal
+import io.ktor.auth.jwt.jwt
 import io.ktor.http.HttpStatusCode
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
-import java.util.*
 import kotlin.text.*
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
@@ -51,27 +58,40 @@ fun Application.module(testing: Boolean = false) {
         }
     }
 
+    install(Authentication) {
+        jwt {
+            verifier(JWTAuth.verifier)
+            realm = JWTAuth.realm
+            validate {
+                val userId = it.payload.getClaim("userId").asInt()
+
+                User(id = userId)
+            }
+        }
+    }
+
     initDB()
 
     routing {
+        authenticate {
+            get("/creators/{creatorId}/drugs") {
+                try {
+                    val drugController = DrugController()
 
-        get("/creators/{creatorId}/drugs") {
-            try {
-                val drugController = DrugController()
+                    val creatorId = call.parameters["creatorId"]?.toInt() ?: throw IllegalArgumentException()
+                    val withVerified = call.request.queryParameters["withVerified"]?.toBoolean() ?: true
+                    val includedResources = call.request.queryParameters["include"]?.split(",")
 
-                val creatorId = call.parameters["creatorId"]?.toInt() ?: throw IllegalArgumentException()
-                val withVerified = call.request.queryParameters["withVerified"]?.toBoolean() ?: true
-                val includedResources = call.request.queryParameters["include"]?.split(",")
+                    val drugData = drugController.getAllByCreator(creatorId, withVerified, includedResources)
 
-                val drugData = drugController.getAllByCreator(creatorId, withVerified, includedResources)
-
-                call.respond(drugData)
-            } catch (e: Exception) {
-                val statusCode = when (e) {
-                    is IllegalArgumentException, is NumberFormatException -> HttpStatusCode.BadRequest
-                    else -> throw e;
+                    call.respond(drugData)
+                } catch (e: Exception) {
+                    val statusCode = when (e) {
+                        is IllegalArgumentException, is NumberFormatException -> HttpStatusCode.BadRequest
+                        else -> throw e;
+                    }
+                    call.respond(statusCode)
                 }
-                call.respond(statusCode)
             }
         }
 
@@ -121,11 +141,11 @@ fun Application.module(testing: Boolean = false) {
         post("/users") {
             try {
                 val userController = UserController()
+
                 val userFDTO = call.receive<UserFDTO>()
+                val authData = userController.createNew(userFDTO)
 
-                userController.createNew(userFDTO)
-
-                call.respond(HttpStatusCode.Created, "User has been created.")
+                call.respond(HttpStatusCode.Created, authData)
             } catch (e: Exception) {
                 var statusCode = HttpStatusCode.InternalServerError
                 var message = "Something went wrong with the server."
@@ -237,5 +257,6 @@ fun Application.module(testing: Boolean = false) {
 //        }
     }
 }
+
 
 //private fun <E> ArrayList<E>.add(index: Int, element: DrugComponent) {
