@@ -1,4 +1,4 @@
-package com.medtracker.services.FDTOParsers
+package com.medtracker.services.responseParsers
 
 import com.medtracker.models.Agenda
 import com.medtracker.models.Container

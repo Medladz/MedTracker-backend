@@ -1,7 +1,8 @@
-package com.medtracker.services.RDTOParsers
+package com.medtracker.services.responseParsers
 
 import com.medtracker.models.Container
-import com.medtracker.services.dto.*
+import com.medtracker.services.dto.ContainerRDTO
+import com.medtracker.services.dto.ResourceRDTO
 
 class ContainersParser {
 

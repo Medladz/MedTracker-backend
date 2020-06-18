@@ -1,14 +1,9 @@
-package com.medtracker.services.FDTOParsers
+package com.medtracker.services.responseParsers
 
 import com.medtracker.models.Drug
-import com.medtracker.services.RDTOParsers.BrandsParser
-import com.medtracker.services.RDTOParsers.ContainersParser
-import com.medtracker.services.RDTOParsers.DrugComponentsParser
-import com.medtracker.services.RDTOParsers.SourcesParser
 import com.medtracker.services.dto.*
 
 class DrugsParser(val includedResources: List<String>?) {
-
     fun parseSingle(drug: Drug): ResourceRDTO<DrugRDTO, DrugRelationshipsRDTO> {
         return ResourceRDTO(
             type = "drugs",

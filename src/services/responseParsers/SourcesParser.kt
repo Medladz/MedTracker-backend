@@ -1,8 +1,8 @@
-package com.medtracker.services.RDTOParsers
+package com.medtracker.services.responseParsers
 
-import com.medtracker.models.Brand
 import com.medtracker.models.Source
-import com.medtracker.services.dto.*
+import com.medtracker.services.dto.ResourceRDTO
+import com.medtracker.services.dto.SourceRDTO
 
 class SourcesParser {
     fun parseSingle(source: Source): ResourceRDTO<SourceRDTO, Unit> {

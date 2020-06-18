@@ -4,6 +4,8 @@ import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.Table
 
 object DrugContainerDAO : Table("\"drugContainer\""){
-    val drugId: Column<Int> = integer("drugID").references(DrugDAO.id).primaryKey(0)
-    val containerId: Column<Int> = integer("containerID").references(ContainerDAO.id).primaryKey(1)
+    val drugId: Column<Int> = integer("drugID").references(DrugDAO.id)
+    val containerId: Column<Int> = integer("containerID").references(ContainerDAO.id)
+
+    override val primaryKey = PrimaryKey(drugId, containerId)
 }
