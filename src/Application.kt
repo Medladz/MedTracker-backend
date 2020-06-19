@@ -50,11 +50,11 @@ fun Application.module(testing: Boolean = false) {
 
     install(StatusPages) {
         exception<UnrecognizedPropertyException> {
-            call.respond(HttpStatusCode.UnprocessableEntity, "Body parameters doesn't suffice the specifications.")
+            call.respond(HttpStatusCode.UnprocessableEntity, "Body parameters didn't meet the requirements.")
         }
 
         exception<MissingKotlinParameterException> {
-            call.respond(HttpStatusCode.UnprocessableEntity, "Body parameters doesn't suffice the specifications.")
+            call.respond(HttpStatusCode.UnprocessableEntity, "Body parameters didn't meet the requirements.")
         }
 
         exception<UnauthorizedException> {
