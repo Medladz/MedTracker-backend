@@ -94,19 +94,19 @@ create table "drugContainer"(
 );
 
 -- DUMMY DATA INSERT
-INSERT INTO "user" ("ID", username, email, password, verified, birthday) VALUES (1, 'jonty', 'jonty@gmail.com', '$2a$10$bIr9HKWuWAB6Xd.jKyN4EeI0VzIJ5/7LpIhjppB6UC/Bx1b4P1GVi', true, '2020-06-06');
-INSERT INTO "user" ("ID", username, email, password, verified, birthday) VALUES (2, 'henk', 'henk@gmail.com', '$2a$10$tkJUZ53HCre0vFv07nyuJe5Xt4BBNu7uzdKCDGxbJcwMd4IU3ct3a', false, '2020-06-06');
-INSERT INTO "user" ("ID", username, email, password, verified, birthday) VALUES (3, 'finn', 'finn@gmail.com', '$2a$10$Vhfk8Wy5tdn2BzKzJ747zuqdZgX9YyJ7ECSGgsDBn2M0psI5XanYu', false, '2020-06-06');
+INSERT INTO "user" (username, email, password, verified, birthday) VALUES ('jonty', 'jonty@gmail.com', '$2a$10$bIr9HKWuWAB6Xd.jKyN4EeI0VzIJ5/7LpIhjppB6UC/Bx1b4P1GVi', true, '2020-06-06');
+INSERT INTO "user" (username, email, password, verified, birthday) VALUES ('henk', 'henk@gmail.com', '$2a$10$tkJUZ53HCre0vFv07nyuJe5Xt4BBNu7uzdKCDGxbJcwMd4IU3ct3a', false, '2020-06-06');
+INSERT INTO "user" (username, email, password, verified, birthday) VALUES ('finn', 'finn@gmail.com', '$2a$10$Vhfk8Wy5tdn2BzKzJ747zuqdZgX9YyJ7ECSGgsDBn2M0psI5XanYu', false, '2020-06-06');
 
-INSERT INTO "brand" ("ID", "creatorID", name) VALUES (1, 1, 'a brand');
+INSERT INTO "brand" ("creatorID", name) VALUES (1, 'a brand');
 
-INSERT INTO "source" ("ID", "creatorID", name) VALUES (1, 1, 'a source');
+INSERT INTO "source" ("creatorID", name) VALUES (1, 'a source');
 
-INSERT INTO "container" ("ID", "creatorID", name, quantity, "measurementUnit", "thumbnailURL") VALUES (1, 1, 'a container', 250, 'ml', 'https://www.kruizinga.nl/productsV2/1536/16000/16FT-02AC-aa.jpg');
+INSERT INTO "container" ("creatorID", name, quantity, "measurementUnit", "thumbnailURL") VALUES (1, 'a container', 250, 'ml', 'https://www.kruizinga.nl/productsV2/1536/16000/16FT-02AC-aa.jpg');
 
-INSERT INTO "drug" ("ID", "creatorID", "brandID", "sourceID", name, "thumbnailURL") VALUES (1, 1, 1, 1, 'drug by jonty', null);
-INSERT INTO "drug" ("ID", "creatorID", "brandID", "sourceID", name, "thumbnailURL") VALUES (2, 2, 1, 1, 'drug by henk', 'https://upload.wikimedia.org/wikipedia/commons/1/1c/Water_molecule_3D.svg');
-INSERT INTO "drug" ("ID", "creatorID", "brandID", "sourceID", name, "thumbnailURL") VALUES (3, 3, null, null, 'drug by finn', 'https://upload.wikimedia.org/wikipedia/commons/1/1c/Water_molecule_3D.svg');
+INSERT INTO "drug" ("creatorID", "brandID", "sourceID", name, "thumbnailURL") VALUES (1, 1, 1, 'drug by jonty', null);
+INSERT INTO "drug" ("creatorID", "brandID", "sourceID", name, "thumbnailURL") VALUES (2, 1, 1, 'drug by henk', 'https://upload.wikimedia.org/wikipedia/commons/1/1c/Water_molecule_3D.svg');
+INSERT INTO "drug" ("creatorID", "brandID", "sourceID", name, "thumbnailURL") VALUES (3, null, null, 'drug by finn', 'https://upload.wikimedia.org/wikipedia/commons/1/1c/Water_molecule_3D.svg');
 
 INSERT INTO "drugComponent" ("drugID", "componentID", purity, quantity, "measurementUnit") VALUES (2, 1, 50.00, 100, 'ml');
 INSERT INTO "drugComponent" ("drugID", "componentID", purity, quantity, "measurementUnit") VALUES (3, 1, 20.00, 50, 'ml');
