@@ -41,7 +41,6 @@ dependencies {
     implementation "org.postgresql:postgresql:42.2.5"
     implementation 'com.auth0:java-jwt:3.10.3'
     implementation "io.ktor:ktor-auth:$ktor_version"
-    implementation "joda-time:joda-time:2.10.6"
     testImplementation "io.ktor:ktor-server-tests:$ktor_version"
 
 }
