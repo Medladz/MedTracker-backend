@@ -5,7 +5,8 @@ import org.postgresql.util.PGobject
 
 enum class MeasurementUnit {
     mg,
-    ml;
+    ml,
+    unit;
 
     companion object {
         fun pgColumn(table: Table, name: String) = table.customEnumeration(
