@@ -2,8 +2,8 @@ package com.medtracker.services
 
 import com.medtracker.models.Agenda
 import com.medtracker.repositories.AgendaRepository
-import com.medtracker.services.FDTOParsers.AgendaParser
 import com.medtracker.services.dto.AgendaFDTO
+import com.medtracker.services.responseParsers.AgendaParser
 
 class AgendaService {
 

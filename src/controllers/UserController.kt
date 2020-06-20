@@ -1,38 +1,53 @@
 package com.medtracker.controllers
 
 import com.medtracker.models.User
-import com.medtracker.models.UserDTO
-import com.medtracker.repositories.dao.UserDAO
-import com.medtracker.services.DrugService
+import com.medtracker.services.JWTAuth
 import com.medtracker.services.UserService
-import org.jetbrains.exposed.sql.deleteWhere
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.selectAll
-import org.jetbrains.exposed.sql.transactions.transaction
-import org.jetbrains.exposed.sql.update
-import org.joda.time.DateTime
-import org.joda.time.format.DateTimeFormat
-import org.joda.time.format.DateTimeFormatter
-
+import com.medtracker.services.dto.AuthDTO
+import com.medtracker.services.dto.LoginFDTO
+import com.medtracker.services.dto.UserFDTO
+import com.medtracker.services.responseParsers.AuthParser
+import com.medtracker.utilities.UnprocessableEntityException
+import java.lang.IllegalArgumentException
 
 class UserController {
 
-    fun insert(user: UserDTO) {
+    /**
+     * Parse the [userFDTO] to a [User].
+     * Use the [UserService] to create a new user record.
+     * Use the [AuthParser] to send back the [AuthDTO] with the generated JWT.
+     */
+    fun createNew(userFDTO: UserFDTO): AuthDTO {
+        try {
+            val userService = UserService()
+            val authParser = AuthParser()
+            val user = userService.parseUserFDTO(userFDTO)
 
-        transaction {
-            UserDAO.insert {
-                it[username] = user.username
-                it[email] = user.email
-                it[password] = user.password
-                it[verified] = user.verified
-                it[birthday] = DateTime.parse(user.birthday)
+            userService.createNew(user)
+
+            return authParser.parse(JWTAuth.generate(user))
+        } catch (e: Exception) {
+            when(e){
+                is IllegalArgumentException -> throw UnprocessableEntityException(e.message)
+                else -> throw e
             }
         }
     }
-    fun login(includedResources: List<String>?){
+
+    /**
+     * Parse the [loginFDTO] to a [User].
+     * Use this model to login the user with the [UserService].
+     * Use the [AuthParser] to send back the [AuthDTO] with the generated JWT.
+     */
+    fun login(loginFDTO: LoginFDTO): AuthDTO {
         val userService = UserService()
-        val jwtToken= userService.login(includedResources)
-        return jwtToken
+        val authParser = AuthParser();
+
+        val user: User = userService.parseLoginFDTO(loginFDTO)
+
+        userService.login(user)
+
+        return authParser.parse(JWTAuth.generate(user))
     }
 
 //    fun update(user: UserDTO, id: Int) {

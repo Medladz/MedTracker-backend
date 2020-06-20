@@ -1,7 +1,8 @@
-package com.medtracker.services.RDTOParsers
+package com.medtracker.services.responseParsers
 
 import com.medtracker.models.Drug
-import com.medtracker.services.dto.*
+import com.medtracker.services.dto.DrugComponentRDTO
+import com.medtracker.services.dto.ResourceRDTO
 
 class DrugComponentsParser {
 
