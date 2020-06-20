@@ -1,8 +1,8 @@
 # Requirements
 The following requirements are needed to run the application:\
-PostgreSQL version 12.2 https://www.postgresql.org/download/ \
-Java SE version 14 https://www.oracle.com/java/technologies/javase/jdk14-archive-downloads.html \
-Git https://git-scm.com/downloads
+[PostgreSQL](https://www.postgresql.org/download/) version 12.2  \
+[Java SE](https://www.oracle.com/java/technologies/javase/jdk14-archive-downloads.html) version 14  \
+[Git](https://git-scm.com/downloads)
 
 # Download the project
 Clone the project by using a [Git GUI](https://git-scm.com/downloads/guis), integrated GIT system in your IDE, or by using the terminal.
