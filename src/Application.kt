@@ -131,10 +131,12 @@ fun Application.module(testing: Boolean = false) {
 
             route("/agendaEntries") {
                 post {
+                    val user = call.authentication.principal<User>()!!
+                    val creatorId = user.id!!
                     val agendaController = AgendaController()
                     val agendaFDTO = call.receive<AgendaFDTO>()
 
-                    agendaController.createAgendaEntry(agendaFDTO)
+                    agendaController.createAgendaEntry(agendaFDTO,creatorId)
 
                     call.respond(HttpStatusCode.Created, mapOf("data" to "Agenda has been created."))
                 }

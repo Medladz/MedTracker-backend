@@ -1,14 +1,13 @@
 package com.medtracker.services.dto
 
 import com.medtracker.repositories.enumTypes.MeasurementUnit
-import com.medtracker.repositories.enumTypes.WeightOrVolume
 
 //Format Data Transfer Object
 data class AgendaFDTO(
     val title: String,
     val note: String? = null,
     val quantity: Int,
-    val measurementUnit: WeightOrVolume,
+    val measurementUnit: MeasurementUnit,
     val consumedAt: String,
     val creatorID: Int,
     val drugID: Int,

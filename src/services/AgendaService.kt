@@ -7,11 +7,11 @@ import com.medtracker.services.responseParsers.AgendaParser
 
 class AgendaService {
 
-    fun createAgendaEntry(agendaFDTO: AgendaFDTO) {
+    fun createAgendaEntry(agendaFDTO: AgendaFDTO,creatorId: Int) {
         val agendaRepository = AgendaRepository()
         val agendaParser = AgendaParser(Agenda())
         agendaParser.parse(agendaFDTO)
-        return agendaRepository.createAgendaEntry(agendaParser.agenda)
+        return agendaRepository.createAgendaEntry(agendaParser.agenda,creatorId)
     }
 
     fun getAgendaEntriesByCreator(creatorId: Int, includedResources: List<String>?): ArrayList<Agenda> {
