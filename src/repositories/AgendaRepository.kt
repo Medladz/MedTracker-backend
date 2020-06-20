@@ -9,6 +9,7 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.joda.time.DateTime
 import org.postgresql.jdbc.PgResultSet.toInt
+import com.medtracker.repositories.enumTypes.MeasurementUnit
 
 
 class AgendaRepository {

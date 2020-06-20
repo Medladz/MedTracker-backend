@@ -14,6 +14,7 @@ object AgendaDAO : Table("\"agendaEntry\"") {
     val title: Column<String> = varchar("title",255)
     val note: Column<String?> = text("note").nullable()
     val quantity: Column<Int?> = integer("quantity").nullable()
-    val measurementUnit: Column<MeasurementUnit?> = MeasurementUnit.pgColumn(this,"measurementUnit").nullable()
+    val measurementUnit: Column<WeightOrVolume?> = WeightOrVolume.pgColumn(this,"measurementUnit").nullable()
     val consumedAt: Column<DateTime> = date("consumedAt")
 }
+
