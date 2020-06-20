@@ -19,7 +19,6 @@ import com.medtracker.models.Agenda
 import com.medtracker.models.User
 import com.medtracker.services.JWTAuth
 import java.lang.Exception
-import java.lang.IllegalArgumentException
 import com.medtracker.services.dto.AgendaFDTO
 import com.medtracker.services.dto.LoginFDTO
 import com.medtracker.services.dto.UserFDTO
