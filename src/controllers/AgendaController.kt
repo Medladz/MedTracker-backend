@@ -4,11 +4,12 @@ import com.medtracker.models.Agenda
 import com.medtracker.services.AgendaService
 import com.medtracker.services.dto.AgendaFDTO
 
+
 class AgendaController {
 
-    fun createAgendaEntry(agenda: AgendaFDTO) {
+    fun createAgendaEntry(agenda: AgendaFDTO,creatorId: Int) {
         val agendaService = AgendaService()
-        val agendaEntry = agendaService.createAgendaEntry(agenda)
+        val agendaEntry = agendaService.createAgendaEntry(agenda,creatorId)
         return agendaEntry
     }
     fun getAgendaEntriesByCreator(creatorId: Int, includedResources: List<String>?): ArrayList<Agenda>{

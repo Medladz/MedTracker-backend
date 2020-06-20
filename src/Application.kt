@@ -19,7 +19,6 @@ import com.medtracker.models.Agenda
 import com.medtracker.models.User
 import com.medtracker.services.JWTAuth
 import java.lang.Exception
-import java.lang.IllegalArgumentException
 import com.medtracker.services.dto.AgendaFDTO
 import com.medtracker.services.dto.LoginFDTO
 import com.medtracker.services.dto.UserFDTO
@@ -131,10 +130,12 @@ fun Application.module(testing: Boolean = false) {
 
             route("/agendaEntries") {
                 post {
+                    val user = call.authentication.principal<User>()!!
+                    val creatorId = user.id!!
                     val agendaController = AgendaController()
                     val agendaFDTO = call.receive<AgendaFDTO>()
 
-                    agendaController.createAgendaEntry(agendaFDTO)
+                    agendaController.createAgendaEntry(agendaFDTO,creatorId)
 
                     call.respond(HttpStatusCode.Created, mapOf("data" to "Agenda has been created."))
                 }

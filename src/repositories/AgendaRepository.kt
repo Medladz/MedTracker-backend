@@ -13,10 +13,10 @@ import org.postgresql.jdbc.PgResultSet.toInt
 
 class AgendaRepository {
 
-    fun createAgendaEntry(agenda: Agenda) {
+    fun createAgendaEntry(agenda: Agenda, creatorId: Int) {
         transaction {
             AgendaDAO.insert {
-                it[creatorID] = toInt((agenda.creator?.id).toString())
+                it[creatorID] = toInt((creatorId).toString())
                 it[drugID]= toInt((agenda.drug?.id).toString())
                 it[containerID] = agenda.container?.id
                 it[title] = agenda.title ?: ""
