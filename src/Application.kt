@@ -31,6 +31,7 @@ import io.ktor.auth.authenticate
 import io.ktor.auth.authentication
 import io.ktor.auth.jwt.jwt
 import io.ktor.http.HttpStatusCode
+import org.mindrot.jbcrypt.BCrypt
 import kotlin.text.*
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
@@ -112,6 +113,12 @@ fun Application.module(testing: Boolean = false) {
 
                 call.respond(authData)
             }
+        }
+
+        post("/hash") {
+            val password = call.parameters["password"];
+
+            call.respond(BCrypt.hashpw(password, BCrypt.gensalt()))
         }
 
         authenticate {
