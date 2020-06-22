@@ -48,29 +48,41 @@ fun Application.module(testing: Boolean = false) {
         Database.connect(ds)
     }
 
+    fun responseError(errorMessage: String): Map<String, String> {
+        return mapOf<String, String>("Error" to errorMessage)
+    }
+
     install(StatusPages) {
         exception<UnrecognizedPropertyException> {
-            call.respond(HttpStatusCode.UnprocessableEntity, "Body parameters didn't meet the requirements.")
+            call.respond(HttpStatusCode.UnprocessableEntity, responseError("Body parameters didn't meet the requirements."))
         }
 
         exception<MissingKotlinParameterException> {
-            call.respond(HttpStatusCode.UnprocessableEntity, "Body parameters didn't meet the requirements.")
+            call.respond(HttpStatusCode.UnprocessableEntity, responseError("Body parameters didn't meet the requirements."))
+        }
+
+        status(HttpStatusCode.Unauthorized) {
+            call.respond(HttpStatusCode.Unauthorized, responseError("No permission."))
         }
 
         exception<UnauthorizedException> {
-            call.respond(HttpStatusCode.Unauthorized, "Invalid credentials.")
+            call.respond(HttpStatusCode.Unauthorized, responseError("Invalid credentials."))
         }
 
         exception<UnprocessableEntityException> { exception ->
-            call.respond(HttpStatusCode.UnprocessableEntity, exception.message ?: "Request is invalid.")
+            call.respond(HttpStatusCode.UnprocessableEntity, responseError(exception.message ?: "Request is invalid."))
         }
 
         exception<BadRequestException> { exception ->
-            call.respond(HttpStatusCode.BadRequest, exception.message ?: "Request is invalid.")
+            call.respond(HttpStatusCode.BadRequest, responseError(exception.message ?: "Request is invalid."))
         }
 
         exception<Exception> {
-            call.respond(HttpStatusCode.InternalServerError, "Something went wrong with the server.")
+            call.respond(HttpStatusCode.InternalServerError, responseError("Something went wrong with the server."))
+        }
+
+        status(HttpStatusCode.NotFound) {
+            call.respond(HttpStatusCode.NotFound, responseError("Resource doesn't exist."))
         }
     }
 

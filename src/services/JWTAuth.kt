@@ -11,6 +11,7 @@ object JWTAuth {
     private val algorithm = Algorithm.HMAC512(secret)
 
     const val realm = "com.medtracker"
+
     val verifier: JWTVerifier = JWT.require(algorithm).withIssuer(issuer).build()
 
     fun generate(user: User): String = JWT.create()
